@@ -1,5 +1,5 @@
 resources:
-  - namespace.yaml
+  # - namespace.yaml
   - cert-manager
   # - home-assistant
   - nginx-ingress
