@@ -1,4 +1,4 @@
 resources:
   - namespace.yaml
   - helmrelease.yaml
-  # - cluster-issuer.yaml
+  - cluster-issuer.yaml
