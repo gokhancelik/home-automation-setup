@@ -1,21 +1,16 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: cert-manager
-  namespace: cert-manager
+  name: home-assistant
+  namespace: home-automation
 spec:
   interval: 5m
   chart:
     spec:
-      chart: cert-manager
-      version: v1.14.3
+      chart: ./charts/home-assistant
       sourceRef:
-        kind: HelmRepository
-        name: jetstack
+        kind: GitRepository
+        name: home-automation-setup
         namespace: flux-system
-  install:
-    crds: Create
-  upgrade:
-    crds: CreateReplace
-  values:
-    installCRDs: true
+  valuesFrom: []
+  values: {}

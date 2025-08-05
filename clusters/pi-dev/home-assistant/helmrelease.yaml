@@ -10,7 +10,7 @@ spec:
       version: 13.4.2  # or latest listed on GitHub
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: k8s-at-home
         namespace: flux-system
   interval: 5m
   values:

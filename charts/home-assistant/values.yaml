@@ -1,0 +1,21 @@
+image:
+  repository: ghcr.io/home-assistant/home-assistant
+  tag: "2025.8.0b2"
+  pullPolicy: IfNotPresent
+
+secretRef:
+  name: postgres-ha-secret
+
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ha.gcelik.dev
+  tls:
+    enabled: true
+    secretName: ha-tls
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: local-path
