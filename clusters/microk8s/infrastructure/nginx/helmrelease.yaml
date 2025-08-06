@@ -13,10 +13,17 @@ spec:
         kind: HelmRepository
         name: ingress-nginx
         namespace: flux-system
+  install:
+    remediation:
+      retries: 3
   values:
     controller:
+      hostNetwork: true
+      hostPort:
+        enabled: true
+      kind: DaemonSet
       service:
-        type: LoadBalancer
+        type: ClusterIP
       resources:
         requests:
           cpu: 100m
@@ -24,3 +31,5 @@ spec:
         limits:
           cpu: 500m
           memory: 256Mi
+      admissionWebhooks:
+        enabled: false
