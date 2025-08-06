@@ -1,2 +1,2 @@
 resources:
-  - ssd-storage.yaml
+  - ssd-storageclass.yaml
