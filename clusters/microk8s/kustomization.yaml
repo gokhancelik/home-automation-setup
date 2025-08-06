@@ -3,6 +3,6 @@ resources:
   - sources
   - cert-manager
   - cert-issuer
-  - databases
-  - nginx-ingress
-  - home-assistant
+  # - databases
+  # - nginx-ingress
+  # - home-assistant
