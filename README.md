@@ -198,7 +198,39 @@ Set up Flux CD (GitOps operator) to manage Kubernetes manifests and Helm release
     - Generate a classic token with `repo` and `workflow` scopes.
     - **Copy the token value.**
 
-3. **Bootstrap Flux with Your Repository**
+3. **Export MicroK8s Kubeconfig**
+
+    ```bash
+    export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+    ```
+
+    ```bash
+    flux get kustomizations
+    ```
+
+    Or, if you’re running `flux bootstrap`:
+
+    ```bash
+    KUBECONFIG=/var/snap/microk8s/current/credentials/client.config flux bootstrap github \
+    --owner=$GITHUB_USER \
+    --repository=$GITHUB_REPO \
+    --branch=$GITHUB_BRANCH \
+    --path=clusters/microk8s \
+    --personal
+    ```
+
+4. **(Optional) Make kubectl Use MicroK8s by Default**
+
+    If you want `kubectl` and `flux` to always work, you can copy the kubeconfig:
+
+    ```bash
+    mkdir -p ~/.kube
+    cp /var/snap/microk8s/current/credentials/client.config ~/.kube/config
+    ```
+
+    *(This will overwrite any existing \~/.kube/config!)*
+
+5. **Bootstrap Flux with Your Repository**
 
     Set these environment variables, replacing the placeholders:
 
@@ -221,15 +253,15 @@ Set up Flux CD (GitOps operator) to manage Kubernetes manifests and Helm release
     ```
 
     This will:
-        - Create a `flux-system` namespace on your cluster.
-        - Push Flux configuration to your repository at `clusters/microk8s/`.
-        - Set up GitOps synchronization.
+    - Create a `flux-system` namespace on your cluster.
+    - Push Flux configuration to your repository at `clusters/microk8s/`.
+    - Set up GitOps synchronization.
 
-4. **Confirm Flux is Running**
+6. **Confirm Flux is Running**
 
     ```bash
     kubectl get pods -n flux-system
     flux get kustomizations
     ```
 
-All Flux pods should be running and ready.
+    All Flux pods should be running and ready.

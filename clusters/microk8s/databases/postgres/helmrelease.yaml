@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: postgres
+  namespace: databases
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: postgresql
+      version: 16.7.21 
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  values:
+    persistence:
+      enabled: true
+      storageClass: ssd-storage
+      size: 20Gi
+    auth:
+      # For secure password, see Secret section below!
+      username: postgres
+      database: postgres
+      existingSecret: postgres-secret
+
