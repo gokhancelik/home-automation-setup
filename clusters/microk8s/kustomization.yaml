@@ -4,4 +4,4 @@ resources:
   - storage
   - sources
   - databases
-  - infrastructure/nginx
+  - infrastructure
