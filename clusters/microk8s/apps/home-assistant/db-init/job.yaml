@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-hass-db
+  namespace: databases
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-db
+        image: postgres:15-alpine
+        command: ["/bin/bash", "/scripts/init.sh"]
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-auth
+              key: postgres-password
+        - name: HASS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-ha-secret
+              key: password
+        volumeMounts:
+        - name: init-script
+          mountPath: /scripts
+      volumes:
+      - name: init-script
+        configMap:
+          name: init-hass-db
+          defaultMode: 0755
+      restartPolicy: Never
+  backoffLimit: 4

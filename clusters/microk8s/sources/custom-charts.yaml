@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: custom-charts
+  namespace: flux-system
+spec:
+  type: oci
+  url: file://Projects/home-automation-setup/charts

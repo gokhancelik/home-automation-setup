@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-hass-db
+  namespace: databases
+data:
+  init.sh: |
+    #!/bin/bash
+    set -e
+    
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+      CREATE USER homeassistant WITH PASSWORD '$HASS_PASSWORD';
+      CREATE DATABASE homeassistant OWNER homeassistant;
+      GRANT ALL PRIVILEGES ON DATABASE homeassistant TO homeassistant;
+    EOSQL
