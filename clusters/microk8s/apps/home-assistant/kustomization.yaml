@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - db-init
-  - postgres-ha-auth.sops.yaml
   - helmrelease.yaml
