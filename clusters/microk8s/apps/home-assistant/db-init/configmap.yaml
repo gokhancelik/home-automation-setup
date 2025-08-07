@@ -5,11 +5,16 @@ metadata:
   namespace: databases
 data:
   init.sh: |
-    #!/bin/bash
+    #!/bin/sh
     set -e
     
-    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-      CREATE USER homeassistant WITH PASSWORD '$HASS_PASSWORD';
-      CREATE DATABASE homeassistant OWNER homeassistant;
-      GRANT ALL PRIVILEGES ON DATABASE homeassistant TO homeassistant;
+    if psql -lqt | cut -d \| -f 1 | grep -qw homeassistant; then
+        echo "Database already exists"
+        exit 0
+    fi
+    
+    psql -v ON_ERROR_STOP=1 <<-EOSQL
+        CREATE USER homeassistant WITH PASSWORD '$HASS_PASSWORD';
+        CREATE DATABASE homeassistant OWNER homeassistant;
+        GRANT ALL PRIVILEGES ON DATABASE homeassistant TO homeassistant;
     EOSQL

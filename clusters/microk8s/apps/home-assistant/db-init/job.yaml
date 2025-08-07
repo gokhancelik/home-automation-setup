@@ -13,19 +13,21 @@ spec:
         env:
         - name: PGHOST
           value: postgres.databases.svc.cluster.local
+        - name: PGDATABASE
+          value: postgres
         - name: PGUSER
           value: postgres
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-auth
-              key: postgres-password
+              key: postgres-password    # This key matches the encrypted secret
         - name: HASS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-ha-secret
               key: password
-              namespace: home-assistant  # Reference secret from home-assistant namespace
+              namespace: home-assistant
         volumeMounts:
         - name: init-script
           mountPath: /scripts
