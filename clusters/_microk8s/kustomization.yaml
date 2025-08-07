@@ -1,8 +1,0 @@
-resources:
-  - namespace.yaml
-  - sources
-  # - cert-issuer
-  # - cert-manager
-  # - databases
-  # - nginx-ingress
-  # - home-assistant
