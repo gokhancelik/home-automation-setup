@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: init-hass-db
-  namespace: databases
+  namespace: home-assistant
 data:
   init.sh: |
     #!/bin/sh

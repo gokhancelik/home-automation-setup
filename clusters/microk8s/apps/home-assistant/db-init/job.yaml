@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-hass-db
-  namespace: databases
+  namespace: home-assistant
 spec:
   template:
     spec:
@@ -22,12 +22,12 @@ spec:
             secretKeyRef:
               name: postgres-auth
               key: postgres-password    # This key matches the encrypted secret
+              namespace: databases
         - name: HASS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-ha-secret
               key: password
-              namespace: home-assistant
         volumeMounts:
         - name: init-script
           mountPath: /scripts

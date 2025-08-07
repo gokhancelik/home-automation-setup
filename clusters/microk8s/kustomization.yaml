@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - storage
   - sources
-  - databases
+  # - databases
   - infrastructure
-  - apps
+  # - apps
