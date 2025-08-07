@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: GitRepository
         name: flux-system
-      version: 0.1.0
+      interval: 1m
   values:
     image:
       repository: ghcr.io/home-assistant/home-assistant
