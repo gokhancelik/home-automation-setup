@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - postgres-admin-sealed-secret.yaml
   - helmrelease.yaml
+  - postgres-external-service.yaml
