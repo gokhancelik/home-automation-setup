@@ -265,3 +265,37 @@ Set up Flux CD (GitOps operator) to manage Kubernetes manifests and Helm release
     ```
 
     All Flux pods should be running and ready.
+
+## Home Assistant with Matter Support
+
+This repository includes a Home Assistant deployment with full Matter support for smart home automation.
+
+### Features
+
+- **Home Assistant 2025.8.0b2** with built-in Matter integration
+- **Host networking** enabled for proper Matter multicast communication
+- **UDP ports 5540 and 5580** exposed for Matter Thread and commissioning
+- **Privileged security context** for network interface access
+- **PostgreSQL backend** for reliable data storage
+- **Ingress with TLS** at `https://ha.gcelik.dev`
+
+### Matter Device Support
+
+- Smart lights (Philips Hue, IKEA, etc.)
+- Smart switches and outlets
+- Door/window sensors
+- Motion sensors
+- Thermostats
+- Smart locks
+- And more Matter-certified devices
+
+### Documentation
+
+For detailed information about the Matter setup, see: [`docs/MATTER_SETUP.md`](docs/MATTER_SETUP.md)
+
+### Quick Start
+
+1. Ensure your Flux setup is running (see above)
+2. Access Home Assistant at `https://ha.gcelik.dev`
+3. Go to Settings → Devices & Services → Integrations
+4. Add Matter integration and commission your devices
