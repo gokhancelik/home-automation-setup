@@ -22,7 +22,6 @@ spec:
             secretKeyRef:
               name: postgres-admin-secret
               key: postgres-password
-              namespace: databases
         - name: HASS_PASSWORD
           valueFrom:
             secretKeyRef:

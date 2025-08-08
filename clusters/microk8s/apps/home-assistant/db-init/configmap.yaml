@@ -8,6 +8,12 @@ data:
     #!/bin/sh
     set -e
     
+    echo "Testing DNS resolution..."
+    nslookup postgres.databases.svc.cluster.local || echo "DNS lookup failed"
+    
+    echo "Testing connection..."
+    pg_isready -h $PGHOST -U $PGUSER || echo "PostgreSQL not ready"
+    
     if psql -lqt | cut -d \| -f 1 | grep -qw homeassistant; then
         echo "Database already exists"
         exit 0
