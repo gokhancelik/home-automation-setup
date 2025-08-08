@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-hass-db
-  namespace: databases
+  namespace: home-assistant
 spec:
   template:
     spec:
