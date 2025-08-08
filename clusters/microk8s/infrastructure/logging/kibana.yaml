@@ -6,6 +6,9 @@ metadata:
 spec:
   interval: 15m
   timeout: 15m
+  dependsOn:
+    - name: elasticsearch
+      namespace: elastic-system
   chart:
     spec:
       chart: kibana
