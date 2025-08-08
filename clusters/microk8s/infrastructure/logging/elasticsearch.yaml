@@ -66,12 +66,10 @@ spec:
     
     # Fix readiness probe for single node
     readinessProbe:
-      exec:
-        command:
-          - bash
-          - -c
-          - |
-            curl -s http://localhost:9200/_cluster/health | grep -q '"status":"green"\|"status":"yellow"'
+      httpGet:
+        path: /_cluster/health?wait_for_status=yellow&timeout=5s
+        port: 9200
+        scheme: HTTP
       initialDelaySeconds: 20
       periodSeconds: 10
       timeoutSeconds: 5
@@ -79,12 +77,10 @@ spec:
     
     # Also fix liveness probe
     livenessProbe:
-      exec:
-        command:
-          - bash
-          - -c
-          - |
-            curl -s http://localhost:9200/_cluster/health | grep -q '"status":"green"\|"status":"yellow"'
+      httpGet:
+        path: /_cluster/health
+        port: 9200
+        scheme: HTTP
       initialDelaySeconds: 30
       periodSeconds: 20
       timeoutSeconds: 5
