@@ -5,13 +5,16 @@ metadata:
   namespace: elastic-system
 spec:
   version: 8.15.0
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
   nodeSets:
   - name: default
     count: 1
     config:
       # Single node cluster configuration for Raspberry Pi
       node.store.allow_mmap: false
-      # Remove xpack.security.enabled - managed by ECK operator
       # Use minimal cluster settings for single node
       cluster.routing.allocation.disk.threshold_enabled: false
     podTemplate:
