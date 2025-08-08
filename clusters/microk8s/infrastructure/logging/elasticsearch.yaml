@@ -4,25 +4,20 @@ metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 8.5.1
+  version: 8.15.0
   nodeSets:
   - name: default
     count: 1
     config:
+      # Single node cluster configuration
       node.store.allow_mmap: false
       xpack.security.enabled: false
       xpack.security.enrollment.enabled: false
       discovery.type: single-node
     podTemplate:
-      metadata:
-        labels:
-          app: elasticsearch
       spec:
         containers:
         - name: elasticsearch
-          env:
-          - name: ES_JAVA_OPTS
-            value: "-Xms1g -Xmx1g"
           resources:
             requests:
               memory: 2Gi
@@ -30,13 +25,16 @@ spec:
             limits:
               memory: 4Gi
               cpu: 1000m
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xms1g -Xmx1g"
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
       spec:
         accessModes:
         - ReadWriteOnce
+        storageClassName: ssd-storage
         resources:
           requests:
             storage: 10Gi
-        storageClassName: ssd-storage

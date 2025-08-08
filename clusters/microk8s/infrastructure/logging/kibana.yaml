@@ -4,18 +4,14 @@ metadata:
   name: kibana
   namespace: elastic-system
 spec:
-  version: 8.5.1
+  version: 8.15.0
   count: 1
   elasticsearchRef:
     name: elasticsearch
-    namespace: elastic-system
   config:
-    server.host: "0.0.0.0"
+    server.publicBaseUrl: https://kibana.gcelik.dev
     xpack.security.enabled: false
   podTemplate:
-    metadata:
-      labels:
-        app: kibana
     spec:
       containers:
       - name: kibana
@@ -30,6 +26,3 @@ spec:
     service:
       spec:
         type: ClusterIP
-    tls:
-      selfSignedCertificate:
-        disabled: true

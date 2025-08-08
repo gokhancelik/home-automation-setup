@@ -5,39 +5,41 @@ metadata:
   namespace: elastic-system
 spec:
   interval: 15m
-  timeout: 15m
+  timeout: 10m
   chart:
     spec:
       chart: eck-operator
-      version: "2.13.0"
+      version: "2.14.0"
       sourceRef:
         kind: HelmRepository
         name: elastic
         namespace: flux-system
-  install:
-    crds: Create
-  upgrade:
-    crds: CreateReplace
   values:
-    # Install CRDs
-    installCRDs: true
-    
     # Manage all namespaces
-    config:
-      validateStorageClass: false
-      metricsPort: 0
-      telemetry:
-        disabled: false
+    managedNamespaces: []
     
-    # Resource limits for the operator
+    # Resource settings for Raspberry Pi
     resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
       requests:
         cpu: 100m
         memory: 150Mi
-      limits:
-        cpu: 1000m
-        memory: 512Mi
     
-    # Pod configuration
-    podSecurityContext:
-      runAsNonRoot: true
+    # Configure RBAC
+    createClusterScopedResources: true
+    
+    # Webhook configuration
+    webhook:
+      enabled: true
+      caBundle: ""
+      
+    # Operator settings
+    config:
+      logVerbosity: 0
+      metricsPort: 0
+      
+    # Telemetry (disable for privacy)
+    telemetry:
+      disabled: true
