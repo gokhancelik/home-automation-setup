@@ -14,7 +14,14 @@ spec:
         kind: HelmRepository
         name: elastic
         namespace: flux-system
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
   values:
+    # Install CRDs
+    installCRDs: true
+    
     # Manage all namespaces
     config:
       validateStorageClass: false
