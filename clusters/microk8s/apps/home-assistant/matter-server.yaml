@@ -19,7 +19,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: matter-server
-        image: ghcr.io/home-assistant-libs/python-matter-server:6.4.1
+        image: ghcr.io/home-assistant-libs/python-matter-server:8.0.0
         command: ["python", "-m", "matter_server.server", "--storage-path", "/data", "--port", "5580"]
         env:
         - name: TZ
