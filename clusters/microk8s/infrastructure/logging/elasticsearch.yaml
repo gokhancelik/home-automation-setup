@@ -59,8 +59,6 @@ spec:
         value: single-node
       - name: ES_JAVA_OPTS
         value: "-Xmx1g -Xms1g"
-      - name: cluster.initial_master_nodes
-        value: ""
     
     # Protocol settings
     protocol: http
