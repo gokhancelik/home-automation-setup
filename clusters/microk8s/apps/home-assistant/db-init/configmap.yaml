@@ -8,19 +8,49 @@ data:
     #!/bin/sh
     set -e
     
+    echo "Starting database initialization..."
+    
     echo "Testing DNS resolution..."
     nslookup $PGHOST || echo "DNS lookup failed"
     
-    echo "Testing connection..."
-    pg_isready -h $PGHOST -U $PGUSER || echo "PostgreSQL not ready"
+    echo "Testing PostgreSQL connection..."
+    pg_isready -h $PGHOST -U $PGUSER || {
+        echo "PostgreSQL not ready, exiting..."
+        exit 1
+    }
     
-    if psql -lqt | cut -d \| -f 1 | grep -qw homeassistant; then
-        echo "Database already exists"
-        exit 0
+    echo "Checking PostgreSQL version..."
+    psql -c "SELECT version();"
+    
+    echo "Checking if homeassistant database exists..."
+    DB_EXISTS=$(psql -tAc "SELECT 1 FROM pg_database WHERE datname='homeassistant'")
+    
+    if [ "$DB_EXISTS" = "1" ]; then
+        echo "Database 'homeassistant' already exists"
+    else
+        echo "Creating homeassistant database..."
+        psql -c "CREATE DATABASE homeassistant;"
+        echo "Database created successfully"
     fi
     
-    psql -v ON_ERROR_STOP=1 <<-EOSQL
-        CREATE USER homeassistant WITH PASSWORD '$HASS_PASSWORD';
-        CREATE DATABASE homeassistant OWNER homeassistant;
-        GRANT ALL PRIVILEGES ON DATABASE homeassistant TO homeassistant;
-    EOSQL
+    echo "Checking if homeassistant user exists..."
+    USER_EXISTS=$(psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='homeassistant'")
+    
+    if [ "$USER_EXISTS" = "1" ]; then
+        echo "User 'homeassistant' already exists"
+        echo "Updating password for existing user..."
+        psql -c "ALTER USER homeassistant WITH PASSWORD '$HASS_PASSWORD';"
+    else
+        echo "Creating homeassistant user..."
+        psql -c "CREATE USER homeassistant WITH PASSWORD '$HASS_PASSWORD';"
+        echo "User created successfully"
+    fi
+    
+    echo "Setting database ownership and permissions..."
+    psql -c "ALTER DATABASE homeassistant OWNER TO homeassistant;"
+    psql -c "GRANT ALL PRIVILEGES ON DATABASE homeassistant TO homeassistant;"
+    
+    echo "Verifying permissions..."
+    psql -c "SELECT datname, datdba::regrole FROM pg_database WHERE datname='homeassistant';"
+    
+    echo "Database initialization completed successfully!"

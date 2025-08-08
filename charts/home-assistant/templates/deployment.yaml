@@ -16,15 +16,49 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      initContainers:
+      - name: prepare-env
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}" > /shared/database_url
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: password
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: host
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: database
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared
       containers:
       - name: home-assistant
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          export DATABASE_URL=$(cat /shared/database_url)
+          exec python -m homeassistant --config /config
         env:
         - name: TZ
           value: {{ .Values.env.TZ | quote }}
-        - name: DATABASE_URL
-          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):5432/$(POSTGRES_DB)"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -49,6 +83,8 @@ spec:
         - containerPort: 8123
           name: http
         volumeMounts:
+        - name: shared-data
+          mountPath: /shared
         {{- if .Values.persistence.enabled }}
         - name: data
           mountPath: /config
@@ -78,3 +114,5 @@ spec:
       - name: configuration
         configMap:
           name: {{ include "home-assistant.fullname" . }}-config
+      - name: shared-data
+        emptyDir: {}
