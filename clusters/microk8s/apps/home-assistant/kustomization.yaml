@@ -4,3 +4,4 @@ resources:
   - namespace.yaml
   - db-init
   - helmrelease.yaml
+  - matter-server.yaml

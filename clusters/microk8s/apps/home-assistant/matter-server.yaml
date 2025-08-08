@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matter-server
+  namespace: home-assistant
+  labels:
+    app: matter-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matter-server
+  template:
+    metadata:
+      labels:
+        app: matter-server
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+      - name: matter-server
+        image: ghcr.io/home-assistant-libs/python-matter-server:8.0.0
+        ports:
+        - containerPort: 5580
+          name: matter-server
+          protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - NET_ADMIN
+              - NET_RAW
+        env:
+        - name: MATTER_SERVER_LOG_LEVEL
+          value: "info"
+        command:
+        - python
+        - -m
+        - matter_server.server
+        - --storage-path
+        - /data
+        - --port
+        - "5580"
+        - --log-level
+        - info
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: matter-server-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: matter-server-data
+  namespace: home-assistant
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ssd-storage
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matter-server
+  namespace: home-assistant
+  labels:
+    app: matter-server
+spec:
+  selector:
+    app: matter-server
+  ports:
+  - name: matter-server
+    port: 5580
+    targetPort: 5580
+    protocol: TCP
+  type: ClusterIP
