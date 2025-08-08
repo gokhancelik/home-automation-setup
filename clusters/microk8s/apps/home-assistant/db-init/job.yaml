@@ -20,7 +20,7 @@ spec:
         - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-auth
+              name: postgres-admin-secret
               key: postgres-password    # This key matches the encrypted secret
               namespace: databases
         - name: HASS_PASSWORD

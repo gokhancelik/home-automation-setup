@@ -15,7 +15,7 @@ spec:
         namespace: flux-system
   values:
     auth:
-      existingSecret: postgres-auth
+      existingSecret: postgres-admin
       secretKeys:
         adminPasswordKey: postgres-password
         replicationPasswordKey: replication-password
