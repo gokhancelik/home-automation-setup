@@ -17,6 +17,8 @@ spec:
       node.store.allow_mmap: false
       # Use minimal cluster settings for single node
       cluster.routing.allocation.disk.threshold_enabled: false
+      # Fix readiness probe port - should be 9200, not 8080
+      readiness.port: "9200"
     podTemplate:
       spec:
         containers:
