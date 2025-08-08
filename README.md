@@ -273,6 +273,7 @@ This repository includes a Home Assistant deployment with full Matter support fo
 ### Features
 
 - **Home Assistant 2025.8.0b2** with built-in Matter integration
+- **Chart version 0.4.1** with native Matter support (no separate containers)
 - **Host networking** enabled for proper Matter multicast communication
 - **UDP ports 5540 and 5580** exposed for Matter Thread and commissioning
 - **Privileged security context** for network interface access

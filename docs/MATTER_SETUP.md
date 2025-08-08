@@ -5,8 +5,9 @@ This document explains the Matter support configuration added to the Home Assist
 ## Changes Made
 
 ### 1. Home Assistant Configuration
-- Added Matter integration to `charts/home-assistant/values.yaml`
+- Added Matter integration directly to the HelmRelease values in `clusters/microk8s/apps/home-assistant/helmrelease.yaml`
 - The Matter integration is automatically enabled in Home Assistant 2025.8.0b2 and later
+- No separate Matter server deployment required - it's built into Home Assistant
 
 ### 2. Kubernetes Configuration Updates
 
@@ -48,6 +49,19 @@ This document explains the Matter support configuration added to the Home Assist
 │   - Matter Enabled  │
 └─────────────────────┘
 ```
+
+## Important Notes
+
+### Single Deployment Approach
+- **No separate Matter server**: Home Assistant 2025.8.x has native Matter support built-in
+- **One container**: Only the `home-assistant` deployment exists - no additional pods needed
+- **Integrated solution**: Matter controller functionality is embedded within Home Assistant itself
+
+### How It Works
+1. Home Assistant acts as the Matter controller/hub
+2. Host networking allows direct access to the network stack for multicast
+3. Matter devices communicate directly with Home Assistant
+4. No bridge or separate Thread border router container required
 
 ## Usage
 
