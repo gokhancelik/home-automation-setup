@@ -23,14 +23,14 @@ spec:
         - name: elasticsearch
           resources:
             requests:
-              memory: 1024Mi
-              cpu: 300m
+              memory: 1536Mi
+              cpu: 500m
             limits:
-              memory: 1024Mi  # Must match request for ECK
-              cpu: 800m
+              memory: 1536Mi  # Must match request for ECK
+              cpu: 1000m
           env:
           - name: ES_JAVA_OPTS
-            value: "-Xms512m -Xmx512m"
+            value: "-Xms1152m -Xmx1152m"
           readinessProbe:
             exec:
               command:
