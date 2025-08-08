@@ -5,6 +5,7 @@ metadata:
   namespace: databases
 spec:
   interval: 15m
+  timeout: 15m # Add this line to increase timeout to 15 minutes
   chart:
     spec:
       chart: postgresql
