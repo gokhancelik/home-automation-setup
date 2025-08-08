@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: elasticsearch
-      version: "8.5.1"  # Use a specific version instead of "8.12.x"
+      version: "8.5.1"
       sourceRef:
         kind: HelmRepository
         name: elastic
@@ -18,20 +18,37 @@ spec:
     replicas: 1
     minimumMasterNodes: 1
     
-    # Resource limits for your cluster
+    # Increased memory for Elasticsearch
     resources:
       requests:
         cpu: "500m"
-        memory: "1Gi"
+        memory: "2Gi"  # Increased from 1Gi
       limits:
         cpu: "1000m"
-        memory: "2Gi"
+        memory: "4Gi"  # Increased from 2Gi
     
-    # Use your SSD storage
+    # JVM heap settings
+    esJavaOpts: "-Xmx2g -Xms2g"
+    
     persistence:
       enabled: true
       storageClass: "ssd-storage"
       size: "10Gi"
     
-    # Single node config for development
     clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+    
+    # Disable security for development
+    esConfig:
+      elasticsearch.yml: |
+        xpack.security.enabled: false
+        xpack.security.enrollment.enabled: false
+
+    # For single node development
+    extraEnvs:
+      - name: discovery.type
+        value: single-node
+      - name: ES_JAVA_OPTS
+        value: "-Xmx2g -Xms2g"
+    
+    # Disable bootstrap checks for development
+    sysctlVmMaxMapCount: 262144
