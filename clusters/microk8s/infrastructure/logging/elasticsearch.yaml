@@ -15,7 +15,7 @@ spec:
         name: elastic
         namespace: flux-system
   values:
-    # Single node setup - IMPORTANT: Don't set minimumMasterNodes
+    # Single node setup
     replicas: 1
     
     # Explicitly disable master node settings
@@ -64,5 +64,17 @@ spec:
     protocol: http
     httpPort: 9200
     
-    # Disable clustering entirely
-    clusterHealthCheckParams: "wait_for_status=yellow&timeout=30s"
+    # Fix readiness probe for single node
+    readinessProbe:
+      httpGet:
+        path: /_cluster/health?wait_for_status=yellow&timeout=5s
+        port: 9200
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+    
+    # Adjust cluster health check for single node
+    clusterHealthCheckParams: "wait_for_status=yellow&timeout=5s"
