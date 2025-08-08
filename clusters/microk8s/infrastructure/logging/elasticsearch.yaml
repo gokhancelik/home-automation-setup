@@ -25,14 +25,14 @@ spec:
         - name: elasticsearch
           resources:
             requests:
-              memory: 1Gi
+              memory: 2Gi
               cpu: 500m
             limits:
-              memory: 1Gi  # Must match request for ECK
+              memory: 2Gi  # Must match request for ECK
               cpu: 1000m
           env:
           - name: ES_JAVA_OPTS
-            value: "-Xms1g -Xmx1g"
+            value: "-Xms2g -Xmx2g"
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
