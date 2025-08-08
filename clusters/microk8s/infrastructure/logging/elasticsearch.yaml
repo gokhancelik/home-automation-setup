@@ -9,21 +9,23 @@ spec:
   - name: default
     count: 1
     config:
-      # Single node cluster configuration
+      # Single node cluster configuration for Raspberry Pi
       node.store.allow_mmap: false
       xpack.security.enabled: false
       xpack.security.enrollment.enabled: false
-      discovery.type: single-node
+      # Remove discovery.type: single-node to allow ECK operator to manage cluster bootstrap
+      # Use minimal cluster settings for single node
+      cluster.routing.allocation.disk.threshold_enabled: false
     podTemplate:
       spec:
         containers:
         - name: elasticsearch
           resources:
             requests:
-              memory: 2Gi
+              memory: 1Gi
               cpu: 500m
             limits:
-              memory: 4Gi
+              memory: 2Gi
               cpu: 1000m
           env:
           - name: ES_JAVA_OPTS
