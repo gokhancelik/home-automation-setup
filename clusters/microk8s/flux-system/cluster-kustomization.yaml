@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cert-manager
+  name: cluster
   namespace: flux-system
 spec:
-  interval: 1m
-  path: "./clusters/microk8s/infrastructure/cert-manager"
+  interval: 10m
+  path: "./clusters/microk8s"
   prune: true
   sourceRef:
     kind: GitRepository
