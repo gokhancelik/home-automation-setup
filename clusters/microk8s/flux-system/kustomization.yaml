@@ -3,4 +3,7 @@ kind: Kustomization
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - cluster-kustomization.yaml
+  - kustomizations/cluster-sops-age.yaml
+  - kustomizations/infrastructure.yaml
+  - kustomizations/databases.yaml
+  - kustomizations/apps.yaml
