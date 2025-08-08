@@ -10,7 +10,7 @@ spec:
     name: elasticsearch
   config:
     server.publicBaseUrl: https://kibana.gcelik.dev
-    xpack.security.enabled: false
+    # Remove xpack.security.enabled - managed by ECK operator
   podTemplate:
     spec:
       containers:
@@ -20,7 +20,7 @@ spec:
             memory: 512Mi
             cpu: 250m
           limits:
-            memory: 1Gi
+            memory: 512Mi  # Match request for consistency
             cpu: 500m
   http:
     service:
