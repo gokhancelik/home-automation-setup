@@ -22,10 +22,10 @@ spec:
     resources:
       requests:
         cpu: "500m"
-        memory: "2Gi"  # Increased from 1Gi
+        memory: "2Gi"
       limits:
         cpu: "1000m"
-        memory: "4Gi"  # Increased from 2Gi
+        memory: "4Gi"
     
     # JVM heap settings
     esJavaOpts: "-Xmx2g -Xms2g"
@@ -37,11 +37,18 @@ spec:
     
     clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
     
-    # Disable security for development
+    # Complete security disable for development
     esConfig:
       elasticsearch.yml: |
+        cluster.name: "elasticsearch"
+        network.host: 0.0.0.0
+        discovery.type: single-node
         xpack.security.enabled: false
         xpack.security.enrollment.enabled: false
+        xpack.security.http.ssl.enabled: false
+        xpack.security.transport.ssl.enabled: false
+        http.host: 0.0.0.0
+        http.port: 9200
 
     # For single node development
     extraEnvs:
@@ -52,3 +59,7 @@ spec:
     
     # Disable bootstrap checks for development
     sysctlVmMaxMapCount: 262144
+    
+    # Protocol settings
+    protocol: http
+    httpPort: 9200
