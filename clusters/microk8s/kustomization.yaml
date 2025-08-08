@@ -4,5 +4,5 @@ resources:
   - storage
   - sources
   - infrastructure
-  # - databases
-  # - apps
+  - databases
+  - apps
