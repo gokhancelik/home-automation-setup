@@ -24,8 +24,8 @@ spec:
             - name: config
               mountPath: /config
           env:
-            - name: TZ
-              value: {{ .Values.env.TZ | quote }}
+            # - name: TZ
+            #   value: {{ .Values.env.TZ | quote }}
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
