@@ -7,9 +7,17 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8123
-      targetPort: 8123
-      protocol: TCP
-      name: http
+  - port: 8123
+    targetPort: 8123
+    protocol: TCP
+    name: http
+  - port: 5540
+    targetPort: 5540
+    protocol: UDP
+    name: matter-thread
+  - port: 5580
+    targetPort: 5580
+    protocol: UDP
+    name: matter-commissioning
   selector:
     {{- include "home-assistant.selectorLabels" . | nindent 4 }}

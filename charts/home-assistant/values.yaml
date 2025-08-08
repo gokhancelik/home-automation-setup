@@ -27,6 +27,12 @@ homeAssistant:
         - 10.0.0.0/8
         - 172.16.0.0/12
         - 192.168.0.0/16
+
+    # Matter support configuration
+    matter:
+      # Enable Matter integration for Thread and Matter-over-Wi-Fi devices
+      # This will automatically discover Matter devices on the network
+      # No additional configuration needed - HA will auto-discover
   
   automations: "[]"  # Empty array for now
   scripts: "{}"      # Empty object for now
@@ -50,3 +56,16 @@ persistence:
   enabled: true
   size: 5Gi
   storageClass: ssd-storage
+
+# Matter support requires host networking for proper multicast communication
+networking:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+# Security context for Matter support
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - NET_ADMIN
+      - NET_RAW

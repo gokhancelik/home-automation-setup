@@ -34,3 +34,15 @@ spec:
     
     secretRef:
       name: postgres-ha-secret
+    
+    # Enable Matter support
+    networking:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+    
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+          - NET_ADMIN
+          - NET_RAW
