@@ -6,6 +6,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: db-init-sa
       containers:
       - name: init-db
         image: postgres:15-alpine
@@ -21,7 +22,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-admin-secret
-              key: postgres-password    # This key matches the encrypted secret
+              key: postgres-password
               namespace: databases
         - name: HASS_PASSWORD
           valueFrom:
@@ -38,3 +39,33 @@ spec:
           defaultMode: 0755
       restartPolicy: Never
   backoffLimit: 4
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db-init-sa
+  namespace: home-assistant
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: databases
+  name: secret-reader
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-secrets
+  namespace: databases
+subjects:
+- kind: ServiceAccount
+  name: db-init-sa
+  namespace: home-assistant
+roleRef:
+  kind: Role
+  name: secret-reader
+  apiGroup: rbac.authorization.k8s.io
