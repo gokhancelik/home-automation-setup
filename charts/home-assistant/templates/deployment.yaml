@@ -3,48 +3,67 @@ kind: Deployment
 metadata:
   name: {{ include "home-assistant.fullname" . }}
   labels:
-    app: {{ include "home-assistant.name" . }}
+    {{- include "home-assistant.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ include "home-assistant.name" . }}
+      {{- include "home-assistant.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ include "home-assistant.name" . }}
+        {{- include "home-assistant.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       containers:
-        - name: home-assistant
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: 8123
-          volumeMounts:
-            - name: config
-              mountPath: /config
-          env:
-            - name: TZ
-              value: {{ .Values.env.TZ | quote }}
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretRef.name }}
-                  key: username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretRef.name }}
-                  key: password
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretRef.name }}
-                  key: database
-            - name: DB_URL
-              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-postgresql.databases.svc.cluster.local:5432/$(POSTGRES_DB)"
-
-      volumes:
+      - name: home-assistant
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: TZ
+          value: {{ .Values.env.TZ | quote }}
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):5432/$(POSTGRES_DB)"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: password
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: host
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name }}
+              key: database
+        ports:
+        - containerPort: 8123
+          name: http
+        volumeMounts:
         - name: config
-          persistentVolumeClaim:
-            claimName: {{ include "home-assistant.fullname" . }}-config
+          mountPath: /config
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          mountPath: /config
+        {{- end }}
+        - name: configuration
+          mountPath: /config/configuration.yaml
+          subPath: configuration.yaml
+      volumes:
+      {{- if .Values.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "home-assistant.fullname" . }}-data
+      {{- end }}
+      - name: configuration
+        configMap:
+          name: {{ include "home-assistant.fullname" . }}-config
