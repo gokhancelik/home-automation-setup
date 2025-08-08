@@ -17,10 +17,10 @@ spec:
       - name: kibana
         resources:
           requests:
-            memory: 512Mi
+            memory: 1Gi
             cpu: 250m
           limits:
-            memory: 512Mi  # Match request for consistency
+            memory: 2Gi
             cpu: 500m
   http:
     service:
