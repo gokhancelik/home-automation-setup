@@ -15,10 +15,13 @@ spec:
         name: elastic
         namespace: flux-system
   values:
-    # Single node setup
+    # Single node setup - IMPORTANT: Don't set minimumMasterNodes
     replicas: 1
     
-    # Increased memory for Elasticsearch
+    # Explicitly disable master node settings
+    masterService: ""
+    
+    # Resources
     resources:
       requests:
         cpu: "500m"
@@ -28,35 +31,40 @@ spec:
         memory: "4Gi"
     
     # JVM heap settings
-    esJavaOpts: "-Xmx2g -Xms2g"
+    esJavaOpts: "-Xmx1g -Xms1g"
     
     persistence:
       enabled: true
       storageClass: "ssd-storage"
       size: "10Gi"
     
-    clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
-    
-    # Complete security disable for development
+    # Override cluster settings completely
     esConfig:
       elasticsearch.yml: |
         cluster.name: "elasticsearch"
         network.host: 0.0.0.0
+        http.host: 0.0.0.0
+        http.port: 9200
         discovery.type: single-node
         xpack.security.enabled: false
         xpack.security.enrollment.enabled: false
         xpack.security.http.ssl.enabled: false
         xpack.security.transport.ssl.enabled: false
-        http.host: 0.0.0.0
-        http.port: 9200
-
-    # For single node development
+        xpack.ml.enabled: false
+        action.auto_create_index: true
+    
+    # Environment variables to override defaults
     extraEnvs:
       - name: discovery.type
         value: single-node
       - name: ES_JAVA_OPTS
-        value: "-Xmx2g -Xms2g"
+        value: "-Xmx1g -Xms1g"
+      - name: cluster.initial_master_nodes
+        value: ""
     
     # Protocol settings
     protocol: http
     httpPort: 9200
+    
+    # Disable clustering entirely
+    clusterHealthCheckParams: "wait_for_status=yellow&timeout=30s"
