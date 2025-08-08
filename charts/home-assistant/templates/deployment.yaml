@@ -57,6 +57,18 @@ spec:
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
           readOnly: true
+        - name: configuration
+          mountPath: /config/automations.yaml
+          subPath: automations.yaml
+          readOnly: true
+        - name: configuration
+          mountPath: /config/scripts.yaml
+          subPath: scripts.yaml
+          readOnly: true
+        - name: configuration
+          mountPath: /config/scenes.yaml
+          subPath: scenes.yaml
+          readOnly: true
       volumes:
       {{- if .Values.persistence.enabled }}
       - name: data
