@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: elasticsearch
-      version: "8.12.x"
+      version: "8.5.1"  # Use a specific version instead of "8.12.x"
       sourceRef:
         kind: HelmRepository
         name: elastic
