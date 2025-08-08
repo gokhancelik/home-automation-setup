@@ -5,9 +5,9 @@ This document explains the Matter support configuration added to the Home Assist
 ## Changes Made
 
 ### 1. Home Assistant Configuration
-- Added Matter integration directly to the HelmRelease values in `clusters/microk8s/apps/home-assistant/helmrelease.yaml`
-- The Matter integration is automatically enabled in Home Assistant 2025.8.0b2 and later
-- No separate Matter server deployment required - it's built into Home Assistant
+- **Removed YAML Matter config**: Matter integration should NOT be configured via YAML in modern Home Assistant
+- **UI-only configuration**: Matter integration must be added through the Home Assistant web interface
+- The networking and security configurations in Kubernetes enable Matter support, but the integration itself is configured via UI
 
 ### 2. Kubernetes Configuration Updates
 
@@ -71,13 +71,15 @@ This document explains the Matter support configuration added to the Home Assist
 
 2. **Go to Integrations**: Settings → Devices & Services → Integrations
 
-3. **Add Matter Device**: 
+3. **Add Matter Integration**: 
    - Click "Add Integration"
-   - Search for "Matter"
-   - Follow the commissioning process
+   - Search for "Matter (BETA)"
+   - Click to install the Matter integration
+   - **Important**: Do NOT configure Matter via YAML - it's UI-only
 
-4. **Commission Device**:
+4. **Commission Matter Device**:
    - Put your Matter device in pairing mode
+   - In Home Assistant, click "Add Device" in the Matter integration
    - Use the Matter QR code or setup code
    - Home Assistant will discover and add the device
 

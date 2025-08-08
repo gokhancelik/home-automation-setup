@@ -60,14 +60,8 @@ spec:
             - 10.0.0.0/8
             - 172.16.0.0/12
             - 192.168.0.0/16
-
-        # Matter support configuration
-        matter:
-          # Enable Matter integration for Thread and Matter-over-Wi-Fi devices
-          # This will automatically discover Matter devices on the network
-          # No additional configuration needed - HA will auto-discover
     
-    # Enable Matter support networking
+    # Enable networking for Matter support (configured via UI, not YAML)
     networking:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
