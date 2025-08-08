@@ -1,6 +1,6 @@
 apiVersion: v2
 name: home-assistant
-description: A custom Helm chart for Home Assistant
+description: A custom Helm chart for Home Assistant with Matter support
 type: application
-version: 0.3.1
+version: 0.4.0
 appVersion: "2025.8.1"
