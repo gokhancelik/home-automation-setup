@@ -68,7 +68,7 @@ spec:
         [OUTPUT]
             Name es
             Match kube.*
-            Host elasticsearch-master.elastic-system.svc.cluster.local
+            Host elasticsearch-es-default.svc.cluster.local
             Port 9200
             Logstash_Format On
             Logstash_Prefix kubernetes
