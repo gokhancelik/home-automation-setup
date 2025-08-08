@@ -42,7 +42,7 @@ spec:
                   name: {{ .Values.secretRef.name }}
                   key: database
             - name: DB_URL
-              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres.databases.svc.cluster.local:5432/$(POSTGRES_DB)"
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-postgresql.databases.svc.cluster.local:5432/$(POSTGRES_DB)"
 
       volumes:
         - name: config

@@ -12,7 +12,7 @@ spec:
         command: ["/bin/sh", "/scripts/init.sh"]
         env:
         - name: PGHOST
-          value: postgres.databases.svc.cluster.local
+          value: postgres-postgresql.databases.svc.cluster.local
         - name: PGDATABASE
           value: postgres
         - name: PGUSER
