@@ -2,3 +2,4 @@ age.key
 sops-age-secret.yaml
 postgres-admin.yaml
 postgres-ha-user.yaml
+*secret-temp.yaml
