@@ -5,9 +5,6 @@ metadata:
   namespace: elastic-system
 spec:
   interval: 15m
-  dependsOn:
-    - name: elasticsearch
-      namespace: elastic-system
   chart:
     spec:
       chart: fluent-bit
