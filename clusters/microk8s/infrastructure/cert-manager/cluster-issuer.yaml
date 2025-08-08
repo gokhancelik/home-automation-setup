@@ -13,7 +13,7 @@ spec:
         cloudflare:
           email: gokhancelik987@gmail.com
           apiTokenSecretRef:
-            name: cloudflare-api-token
+            name: cloudflare-api-token-secret
             key: api-token
       selector:
         dnsZones:
