@@ -6,8 +6,8 @@ image:
 secretRef:
   name: postgres-ha-secret
 
-# env:
-#   TZ: "Amsterdam"
+env:
+  TZ: "Europe/Amsterdam"
 
 ingress:
   enabled: true
