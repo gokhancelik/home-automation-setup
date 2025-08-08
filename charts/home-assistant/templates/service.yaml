@@ -18,6 +18,6 @@ spec:
   - port: 5580
     targetPort: 5580
     protocol: UDP
-    name: matter-commissioning
+    name: matter-comm
   selector:
     {{- include "home-assistant.selectorLabels" . | nindent 4 }}

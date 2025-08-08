@@ -94,7 +94,7 @@ spec:
           name: matter-thread
           protocol: UDP
         - containerPort: 5580
-          name: matter-commissioning
+          name: matter-comm
           protocol: UDP
         volumeMounts:
         - name: shared-data
