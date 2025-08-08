@@ -49,8 +49,6 @@ spec:
         - containerPort: 8123
           name: http
         volumeMounts:
-        - name: config
-          mountPath: /config
         {{- if .Values.persistence.enabled }}
         - name: data
           mountPath: /config
@@ -58,6 +56,7 @@ spec:
         - name: configuration
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
+          readOnly: true
       volumes:
       {{- if .Values.persistence.enabled }}
       - name: data
