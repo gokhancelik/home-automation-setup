@@ -15,8 +15,8 @@ spec:
         name: elastic
         namespace: flux-system
   values:
+    # Single node setup
     replicas: 1
-    minimumMasterNodes: 1
     
     # Increased memory for Elasticsearch
     resources:
@@ -56,9 +56,6 @@ spec:
         value: single-node
       - name: ES_JAVA_OPTS
         value: "-Xmx2g -Xms2g"
-    
-    # Disable bootstrap checks for development
-    sysctlVmMaxMapCount: 262144
     
     # Protocol settings
     protocol: http
