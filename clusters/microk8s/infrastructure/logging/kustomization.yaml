@@ -7,3 +7,4 @@ resources:
   - kibana.yaml
   - kibana-ingress.yaml
   - fluent-bit.yaml
+  - fluent-bit-es-credentials-sealed-secret.yaml

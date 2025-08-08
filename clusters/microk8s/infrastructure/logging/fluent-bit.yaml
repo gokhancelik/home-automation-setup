@@ -26,6 +26,19 @@ spec:
       create: true
       nodeAccess: true
     
+    # Environment variables for Elasticsearch credentials
+    env:
+      - name: ES_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: fluent-bit-es-credentials
+            key: username
+      - name: ES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: fluent-bit-es-credentials
+            key: password
+    
     # Configuration
     config:
       service: |
@@ -70,6 +83,8 @@ spec:
             Match kube.*
             Host elasticsearch-es-http.elastic-system.svc.cluster.local
             Port 9200
+            HTTP_User ${ES_USERNAME}
+            HTTP_Passwd ${ES_PASSWORD}
             Logstash_Format On
             Logstash_Prefix kubernetes
             Retry_Limit 5
