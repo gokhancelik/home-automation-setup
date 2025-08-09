@@ -7,4 +7,5 @@ resources:
   - logging
   - mqtt
   - redis
+  - influxdb
   - test
