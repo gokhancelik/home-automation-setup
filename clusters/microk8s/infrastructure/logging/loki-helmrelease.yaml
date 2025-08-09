@@ -107,3 +107,15 @@ spec:
         enabled: false
         grafanaAgent:
           installOperator: false
+    
+    # Disable memcached components to save memory
+    memcached:
+      enabled: false
+    memcachedChunks:
+      enabled: false
+    memcachedFrontend:
+      enabled: false
+    memcachedIndexQueries:
+      enabled: false
+    memcachedIndexWrites:
+      enabled: false
