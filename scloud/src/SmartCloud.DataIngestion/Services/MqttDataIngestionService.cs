@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
 using SmartCloud.Core.Interfaces;
 using SmartCloud.Core.Models;
 using System.Text.Json;
@@ -26,7 +25,7 @@ public class MqttDataIngestionService : IDataIngestionService, IDisposable
         _logger = logger;
         _configuration = configuration;
         
-        var factory = new MqttFactory();
+        var factory = new MqttClientFactory();
         _mqttClient = factory.CreateMqttClient();
         
         _mqttClient.ApplicationMessageReceivedAsync += OnMessageReceived;
