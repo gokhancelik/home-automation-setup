@@ -19,6 +19,9 @@ spec:
     deploymentMode: SingleBinary
     
     loki:
+      # Disable multi-tenancy (single tenant mode)
+      auth_enabled: false
+      
       # Minimal resource requirements
       resources:
         requests:
