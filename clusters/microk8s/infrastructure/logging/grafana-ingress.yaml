@@ -11,10 +11,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - iot.gokhancelik.dev
+    - iot.gcelik.dev
     secretName: grafana-tls
   rules:
-  - host: iot.gokhancelik.dev
+  - host: iot.gcelik.dev
     http:
       paths:
       - path: /grafana(/|$)(.*)
