@@ -6,4 +6,5 @@ resources:
   - sealed-secrets
   - logging
   - mqtt
+  - redis
   - test
