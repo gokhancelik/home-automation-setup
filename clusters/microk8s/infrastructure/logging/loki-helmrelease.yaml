@@ -1,0 +1,109 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: elastic-system
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: loki
+      version: "6.10.0"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 10m
+  values:
+    # Lightweight configuration for Raspberry Pi
+    deploymentMode: SingleBinary
+    
+    loki:
+      # Minimal resource requirements
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 200m
+      
+      # Storage configuration for Pi
+      storage:
+        type: filesystem
+        filesystem:
+          chunks_directory: /var/loki/chunks
+          rules_directory: /var/loki/rules
+      
+      # Schema configuration
+      schemaConfig:
+        configs:
+          - from: 2024-04-01
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+      
+      # Retention settings
+      limits_config:
+        retention_period: 168h  # 7 days
+        ingestion_rate_mb: 4
+        ingestion_burst_size_mb: 6
+        per_stream_rate_limit: 3MB
+        per_stream_rate_limit_burst: 15MB
+    
+    # Disable all other components - SingleBinary handles everything
+    read:
+      replicas: 0
+    write:
+      replicas: 0
+    backend:
+      replicas: 0
+    
+    # Single binary mode components
+    singleBinary:
+      replicas: 1
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 200m
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClass: ""  # Use default storage class
+    
+    # Disable other components for single binary mode
+    ingester:
+      enabled: false
+    distributor:
+      enabled: false
+    querier:
+      enabled: false
+    queryFrontend:
+      enabled: false
+    queryScheduler:
+      enabled: false
+    compactor:
+      enabled: false
+    indexGateway:
+      enabled: false
+    ruler:
+      enabled: false
+    
+    # Test disabled
+    test:
+      enabled: false
+    
+    # Monitoring disabled to save resources
+    monitoring:
+      serviceMonitor:
+        enabled: false
+      selfMonitoring:
+        enabled: false
+        grafanaAgent:
+          installOperator: false

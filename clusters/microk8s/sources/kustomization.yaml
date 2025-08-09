@@ -7,3 +7,4 @@ resources:
   - sealed-secrets.yaml
   - elastic.yaml
   - fluent.yaml
+  - grafana.yaml
