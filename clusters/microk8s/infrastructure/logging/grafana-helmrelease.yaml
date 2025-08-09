@@ -54,8 +54,13 @@ spec:
     # Grafana configuration
     grafana.ini:
       server:
-        root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
-        serve_from_sub_path: true
+        root_url: "https://grafana.gcelik.dev/"
+        serve_from_sub_path: false
+        domain: grafana.gcelik.dev
+        enforce_domain: false
+        enable_gzip: true
+        protocol: http
+        http_port: 3000
       auth.anonymous:
         enabled: false
       analytics:
