@@ -1,18 +1,18 @@
-# SmartCloud Industrial IoT Platform
+# CloudHMI Industrial IoT Platform
 
-A comprehensive cloud-based Industrial IoT platform for real-time machine monitoring, predictive maintenance, and factory automation.
+**CloudHMI** - Industrial automation in the cloud. A comprehensive web-based SCADA platform for real-time machine monitoring, predictive maintenance, and factory automation.
 
 ## 🏗️ System Architecture
 
 ### Overview
-The SmartCloud platform consists of six main components:
+The CloudHMI platform consists of six main components:
 
-1. **SmartCloud.Core** - Shared models and interfaces
-2. **SmartCloud.DataIngestion** - MQTT/OPC UA data collection
-3. **SmartCloud.Storage** - InfluxDB time-series storage
-4. **SmartCloud.Analytics** - ML.NET predictive maintenance
-5. **SmartCloud.Dashboard** - Blazor real-time dashboard
-6. **SmartCloud.Gateway** - Main coordinator service
+1. **CloudHMI.Core** - Shared models and interfaces
+2. **CloudHMI.DataIngestion** - MQTT/OPC UA data collection
+3. **CloudHMI.Storage** - InfluxDB time-series storage
+4. **CloudHMI.Analytics** - ML.NET predictive maintenance
+5. **CloudHMI.Dashboard** - Blazor real-time dashboard
+6. **CloudHMI.Gateway** - Main coordinator service
 
 ### Architecture Diagram
 ```
@@ -25,7 +25,7 @@ The SmartCloud platform consists of six main components:
                                  │ MQTT/OPC UA
                                  ▼
                     ┌─────────────────────────┐
-                    │  SmartCloud.Gateway     │
+                    │  CloudHMI.Gateway       │
                     │  - Data Coordination    │
                     │  - Analytics Processing │
                     │  - Alarm Management     │
@@ -60,8 +60,8 @@ The SmartCloud platform consists of six main components:
 
 ### 1. Clone and Build
 ```bash
-git clone https://github.com/your-repo/smartcloud
-cd smartcloud
+git clone https://github.com/your-repo/cloudhmi
+cd cloudhmi
 dotnet restore
 dotnet build
 ```
@@ -96,8 +96,8 @@ Update `appsettings.json` in Gateway and Dashboard projects:
   "InfluxDB": {
     "Url": "http://localhost:8086",
     "Token": "your-generated-token",
-    "Bucket": "smartcloud",
-    "Organization": "smartcloud-org"
+    "Bucket": "cloudhmi",
+    "Organization": "cloudhmi-org"
   },
   "MQTT": {
     "BrokerHost": "localhost",
@@ -110,11 +110,11 @@ Update `appsettings.json` in Gateway and Dashboard projects:
 
 ```bash
 # Terminal 1 - Start Gateway
-cd src/SmartCloud.Gateway
+cd src/CloudHMI.Gateway
 dotnet run
 
 # Terminal 2 - Start Dashboard
-cd src/SmartCloud.Dashboard
+cd src/CloudHMI.Dashboard
 dotnet run
 
 # Dashboard will be available at: http://localhost:5000
@@ -169,7 +169,7 @@ factory/{location}/status     # Factory-wide status
 
 ### Adding New Device Types
 
-1. **Create Model** in `SmartCloud.Core/Models/`:
+1. **Create Model** in `CloudHMI.Core/Models/`:
 ```csharp
 public class CustomDeviceData : DeviceDataBase
 {
@@ -243,8 +243,8 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "SmartCloud",
-            ValidAudience = "SmartCloud.Dashboard",
+            ValidIssuer = "CloudHMI",
+            ValidAudience = "CloudHMI.Dashboard",
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
@@ -263,13 +263,13 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   "resources": [
     {
       "type": "Microsoft.ContainerInstance/containerGroups",
-      "name": "smartcloud-gateway",
+      "name": "cloudhmi-gateway",
       "properties": {
         "containers": [
           {
             "name": "gateway",
             "properties": {
-              "image": "smartcloud/gateway:latest",
+              "image": "cloudhmi/gateway:latest",
               "resources": {
                 "requests": {
                   "cpu": 1,

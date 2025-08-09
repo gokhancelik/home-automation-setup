@@ -4,16 +4,16 @@ services:
   # InfluxDB time series database
   influxdb:
     image: influxdb:2.7
-    container_name: smartcloud-influxdb
+    container_name: cloudhmi-influxdb
     ports:
       - "8086:8086"
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=smartcloud123
-      - DOCKER_INFLUXDB_INIT_ORG=smartcloud-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=smartcloud
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=smartcloud-token-12345
+      - DOCKER_INFLUXDB_INIT_PASSWORD=cloudhmi123
+      - DOCKER_INFLUXDB_INIT_ORG=cloudhmi-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=cloudhmi
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=cloudhmi-token-12345
     volumes:
       - influxdb-data:/var/lib/influxdb2
       - influxdb-config:/etc/influxdb2
@@ -27,7 +27,7 @@ services:
   # MQTT Broker (Eclipse Mosquitto)
   mosquitto:
     image: eclipse-mosquitto:2.0
-    container_name: smartcloud-mosquitto
+    container_name: cloudhmi-mosquitto
     ports:
       - "1883:1883"
       - "9001:9001"
@@ -45,7 +45,7 @@ services:
   # Redis for caching and session management (optional)
   redis:
     image: redis:7-alpine
-    container_name: smartcloud-redis
+    container_name: cloudhmi-redis
     ports:
       - "6379:6379"
     volumes:
@@ -61,11 +61,11 @@ services:
   # Grafana for advanced dashboards (optional)
   grafana:
     image: grafana/grafana:10.0.0
-    container_name: smartcloud-grafana
+    container_name: cloudhmi-grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=smartcloud123
+      - GF_SECURITY_ADMIN_PASSWORD=cloudhmi123
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     volumes:
       - grafana-data:/var/lib/grafana
@@ -89,4 +89,4 @@ volumes:
 
 networks:
   default:
-    name: smartcloud-network
+    name: cloudhmi-network
