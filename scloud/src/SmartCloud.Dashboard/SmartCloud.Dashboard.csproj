@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.2" />
+    <PackageReference Include="Blazorise" Version="1.4.2" />
+    <PackageReference Include="Blazorise.Bootstrap5" Version="1.4.2" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.4.2" />
+    <PackageReference Include="ApexCharts.Blazor" Version="0.9.6-alpha" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartCloud.Core\SmartCloud.Core.csproj" />
+    <ProjectReference Include="..\SmartCloud.Storage\SmartCloud.Storage.csproj" />
+    <ProjectReference Include="..\SmartCloud.Analytics\SmartCloud.Analytics.csproj" />
+  </ItemGroup>
+
+</Project>

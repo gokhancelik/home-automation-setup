@@ -1,0 +1,63 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.0.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.Core", "src\SmartCloud.Core\SmartCloud.Core.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.DataIngestion", "src\SmartCloud.DataIngestion\SmartCloud.DataIngestion.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.Storage", "src\SmartCloud.Storage\SmartCloud.Storage.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.Dashboard", "src\SmartCloud.Dashboard\SmartCloud.Dashboard.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.Analytics", "src\SmartCloud.Analytics\SmartCloud.Analytics.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCloud.Gateway", "src\SmartCloud.Gateway\SmartCloud.Gateway.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC944} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC945} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC948} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC949} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}
+	EndGlobalSection
+EndGlobal
