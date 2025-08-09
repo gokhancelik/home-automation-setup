@@ -5,4 +5,5 @@ resources:
   - cert-manager
   - sealed-secrets
   - logging
+  - mqtt
   - test

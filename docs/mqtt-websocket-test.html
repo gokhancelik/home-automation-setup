@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT WebSocket Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .error { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MQTT WebSocket Test</h1>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div>
+            <label>MQTT Broker URL:</label>
+            <input type="text" id="brokerUrl" value="wss://mqtt.gcelik.dev/" placeholder="wss://mqtt.gcelik.dev/">
+        </div>
+        
+        <div>
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()">Disconnect</button>
+        </div>
+        
+        <div>
+            <h3>Publish Message</h3>
+            <input type="text" id="topic" placeholder="Topic (e.g., test/topic)" value="test/topic">
+            <input type="text" id="message" placeholder="Message" value="Hello from WebSocket!">
+            <button onclick="publishMessage()">Publish</button>
+        </div>
+        
+        <div>
+            <h3>Subscribe to Topic</h3>
+            <input type="text" id="subscribeTopic" placeholder="Topic to subscribe" value="test/+">
+            <button onclick="subscribe()">Subscribe</button>
+            <button onclick="unsubscribe()">Unsubscribe</button>
+        </div>
+        
+        <div>
+            <h3>Messages</h3>
+            <div id="messages"></div>
+            <button onclick="clearMessages()">Clear Messages</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        let client = null;
+        let currentSubscription = null;
+
+        function updateStatus(message, isConnected) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${isConnected ? 'connected' : (message.includes('Error') ? 'error' : 'disconnected')}`;
+        }
+
+        function addMessage(message) {
+            const messagesDiv = document.getElementById('messages');
+            const timestamp = new Date().toLocaleTimeString();
+            messagesDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connect() {
+            const brokerUrl = document.getElementById('brokerUrl').value;
+            
+            try {
+                updateStatus('Connecting...', false);
+                addMessage(`Attempting to connect to ${brokerUrl}`);
+                
+                client = mqtt.connect(brokerUrl, {
+                    connectTimeout: 4000,
+                    clientId: 'mqtt_test_' + Math.random().toString(16).substr(2, 8),
+                    clean: true,
+                    reconnectPeriod: 1000,
+                });
+
+                client.on('connect', () => {
+                    updateStatus('Connected', true);
+                    addMessage('Successfully connected to MQTT broker');
+                });
+
+                client.on('error', (error) => {
+                    updateStatus(`Error: ${error.message}`, false);
+                    addMessage(`Connection error: ${error.message}`);
+                });
+
+                client.on('close', () => {
+                    updateStatus('Connection closed', false);
+                    addMessage('Connection closed');
+                });
+
+                client.on('message', (topic, message) => {
+                    addMessage(`Received on "${topic}": ${message.toString()}`);
+                });
+
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`, false);
+                addMessage(`Connection failed: ${error.message}`);
+            }
+        }
+
+        function disconnect() {
+            if (client) {
+                client.end();
+                client = null;
+                updateStatus('Disconnected', false);
+                addMessage('Disconnected from broker');
+            }
+        }
+
+        function publishMessage() {
+            if (!client || !client.connected) {
+                addMessage('Error: Not connected to broker');
+                return;
+            }
+
+            const topic = document.getElementById('topic').value;
+            const message = document.getElementById('message').value;
+
+            if (!topic || !message) {
+                addMessage('Error: Topic and message are required');
+                return;
+            }
+
+            client.publish(topic, message, (error) => {
+                if (error) {
+                    addMessage(`Publish error: ${error.message}`);
+                } else {
+                    addMessage(`Published to "${topic}": ${message}`);
+                }
+            });
+        }
+
+        function subscribe() {
+            if (!client || !client.connected) {
+                addMessage('Error: Not connected to broker');
+                return;
+            }
+
+            const topic = document.getElementById('subscribeTopic').value;
+            if (!topic) {
+                addMessage('Error: Topic is required');
+                return;
+            }
+
+            client.subscribe(topic, (error) => {
+                if (error) {
+                    addMessage(`Subscribe error: ${error.message}`);
+                } else {
+                    currentSubscription = topic;
+                    addMessage(`Subscribed to "${topic}"`);
+                }
+            });
+        }
+
+        function unsubscribe() {
+            if (!client || !client.connected || !currentSubscription) {
+                addMessage('Error: Not connected or no active subscription');
+                return;
+            }
+
+            client.unsubscribe(currentSubscription, (error) => {
+                if (error) {
+                    addMessage(`Unsubscribe error: ${error.message}`);
+                } else {
+                    addMessage(`Unsubscribed from "${currentSubscription}"`);
+                    currentSubscription = null;
+                }
+            });
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        // Initialize with disconnected status
+        updateStatus('Ready to connect', false);
+        addMessage('MQTT WebSocket Test initialized. Click Connect to start.');
+    </script>
+</body>
+</html>
