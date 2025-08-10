@@ -3,3 +3,4 @@ sops-age-secret.yaml
 postgres-admin.yaml
 postgres-ha-user.yaml
 *secret-temp.yaml
+IOT_PLATFORM_CREDENTIALS.md

@@ -36,10 +36,12 @@ spec:
     loki:
       # Disable multi-tenancy (single tenant mode)
       auth_enabled: false
-      
-      # Common config - override the replication factor for single node
-      commonConfig:
-        replication_factor: 1
+
+      # Use direct configuration instead of commonConfig to avoid template issues
+      ingester:
+        lifecycler:
+          ring:
+            replication_factor: 1
         
       # Storage configuration for SingleBinary mode
       storage_config:
