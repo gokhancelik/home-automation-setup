@@ -15,7 +15,7 @@ spec:
         namespace: flux-system
       interval: 10m
   values:
-    # Lightweight configuration for Raspberry Pi
+    # Use SingleBinary deployment mode for Raspberry Pi
     deploymentMode: SingleBinary
     
     # Single binary mode components
@@ -34,83 +34,23 @@ spec:
         storageClass: ""  # Use default storage class
     
     loki:
-      # Disable multi-tenancy (single tenant mode)
+      # Minimal configuration - use chart defaults where possible
       auth_enabled: false
-
-      # Use direct configuration instead of commonConfig to avoid template issues
-      ingester:
-        lifecycler:
-          ring:
-            replication_factor: 1
-        
-      # Storage configuration for SingleBinary mode
+      
+      # Override just what we need for persistence
       storage_config:
+        filesystem:
+          directory: /loki/chunks
         boltdb_shipper:
           active_index_directory: /loki/boltdb-shipper-active
           cache_location: /loki/boltdb-shipper-cache
           shared_store: filesystem
-        filesystem:
-          directory: /loki/chunks
-
-      # Schema configuration
-      schema_config:
-        configs:
-          - from: 2020-10-24
-            store: boltdb-shipper
-            object_store: filesystem
-            schema: v11
-            index:
-              prefix: index_
-              period: 24h
-
-      # Retention settings
-      limits_config:
-        retention_period: 168h  # 7 days
-        ingestion_rate_mb: 4
-        ingestion_burst_size_mb: 6
-        per_stream_rate_limit: 3MB
-        per_stream_rate_limit_burst: 15MB
     
-    # Disable all other components - SingleBinary handles everything
-    read:
-      replicas: 0
-    write:
-      replicas: 0
-    backend:
-      replicas: 0
-    
-    # Disable other components for single binary mode
-    ingester:
+    # Disable resource-intensive components
+    chunksCache:
       enabled: false
-    distributor:
+    resultsCache:
       enabled: false
-    querier:
-      enabled: false
-    queryFrontend:
-      enabled: false
-    queryScheduler:
-      enabled: false
-    compactor:
-      enabled: false
-    indexGateway:
-      enabled: false
-    ruler:
-      enabled: false
-    
-    # Test disabled
-    test:
-      enabled: false
-    
-    # Monitoring disabled to save resources
-    monitoring:
-      serviceMonitor:
-        enabled: false
-      selfMonitoring:
-        enabled: false
-        grafanaAgent:
-          installOperator: false
-    
-    # Disable memcached components to save memory
     memcached:
       enabled: false
     memcachedChunks:
@@ -122,33 +62,9 @@ spec:
     memcachedIndexWrites:
       enabled: false
     
-    # Explicitly disable cache components for Raspberry Pi - using correct parameter names
-    chunksCache:
-      enabled: false
-      replicas: 0
-    resultsCache:
-      enabled: false
-      replicas: 0
-    
-    # Alternative cache component names that might be used
-    memcachedChunksCache:
-      enabled: false
-    memcachedResultsCache:
-      enabled: false
-    
-    # Additional cache configurations to try
-    lokiCanary:
-      enabled: true  # Keep canary for health checks
-    
-    # Try to explicitly set cache configurations
-    minio:
-      enabled: false
-    enterprise:
-      enabled: false
-    
-    # Disable gateway and other resource-intensive components
+    # Keep minimal gateway
     gateway:
-      enabled: true  # Keep minimal gateway
+      enabled: true
       replicas: 1
       resources:
         requests:
@@ -157,3 +73,20 @@ spec:
         limits:
           memory: 64Mi
           cpu: 100m
+          
+    # Keep canary for health checks
+    lokiCanary:
+      enabled: true
+    
+    # Disable other features
+    minio:
+      enabled: false
+    enterprise:
+      enabled: false
+    test:
+      enabled: false
+    monitoring:
+      serviceMonitor:
+        enabled: false
+      selfMonitoring:
+        enabled: false
