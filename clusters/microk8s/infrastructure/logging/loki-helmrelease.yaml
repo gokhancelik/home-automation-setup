@@ -8,17 +8,17 @@ spec:
   chart:
     spec:
       chart: loki
-      version: "6.10.0"
+      version: "5.47.2"  # Use stable version that worked
       sourceRef:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
       interval: 10m
   values:
-    # Use SingleBinary deployment mode for Raspberry Pi
+    # Minimal working configuration for Raspberry Pi
     deploymentMode: SingleBinary
     
-    # Single binary mode components
+    # Single binary configuration
     singleBinary:
       replicas: 1
       resources:
@@ -31,62 +31,29 @@ spec:
       persistence:
         enabled: true
         size: 10Gi
-        storageClass: ""  # Use default storage class
+        storageClass: ""
     
+    # Keep it simple - minimal Loki config
     loki:
-      # Minimal configuration - use chart defaults where possible
       auth_enabled: false
-      
-      # Override just what we need for persistence
-      storage_config:
-        filesystem:
-          directory: /loki/chunks
-        boltdb_shipper:
-          active_index_directory: /loki/boltdb-shipper-active
-          cache_location: /loki/boltdb-shipper-cache
-          shared_store: filesystem
     
-    # Disable resource-intensive components
+    # Keep essential components only
+    gateway:
+      enabled: true
+      replicas: 1
+    
+    lokiCanary:
+      enabled: true
+    
+    # Disable heavy components
     chunksCache:
       enabled: false
     resultsCache:
       enabled: false
     memcached:
       enabled: false
-    memcachedChunks:
-      enabled: false
-    memcachedFrontend:
-      enabled: false
-    memcachedIndexQueries:
-      enabled: false
-    memcachedIndexWrites:
-      enabled: false
-    
-    # Keep minimal gateway
-    gateway:
-      enabled: true
-      replicas: 1
-      resources:
-        requests:
-          memory: 32Mi
-          cpu: 50m
-        limits:
-          memory: 64Mi
-          cpu: 100m
-          
-    # Keep canary for health checks
-    lokiCanary:
-      enabled: true
-    
-    # Disable other features
-    minio:
-      enabled: false
-    enterprise:
-      enabled: false
     test:
       enabled: false
     monitoring:
-      serviceMonitor:
-        enabled: false
       selfMonitoring:
         enabled: false
