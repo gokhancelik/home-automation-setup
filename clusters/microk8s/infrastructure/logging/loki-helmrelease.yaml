@@ -40,17 +40,7 @@ spec:
       # Common config - override the replication factor for single node
       commonConfig:
         replication_factor: 1
-      
-      # Override default replication factor in common section
-      common:
-        replication_factor: 1
-      
-      # Ingester config for single instance
-      ingester:
-        lifecycler:
-          ring:
-            replication_factor: 1
-      
+        
       # Storage configuration for SingleBinary mode
       storage_config:
         boltdb_shipper:
