@@ -37,9 +37,19 @@ spec:
       # Disable multi-tenancy (single tenant mode)
       auth_enabled: false
       
-      # Common config - override the replication factor
+      # Common config - override the replication factor for single node
       commonConfig:
         replication_factor: 1
+      
+      # Override default replication factor in common section
+      common:
+        replication_factor: 1
+      
+      # Ingester config for single instance
+      ingester:
+        lifecycler:
+          ring:
+            replication_factor: 1
       
       # Retention settings
       limits_config:
@@ -100,10 +110,28 @@ spec:
     memcachedIndexWrites:
       enabled: false
     
-    # Explicitly disable cache components for Raspberry Pi
+    # Explicitly disable cache components for Raspberry Pi - using correct parameter names
     chunksCache:
       enabled: false
+      replicas: 0
     resultsCache:
+      enabled: false
+      replicas: 0
+    
+    # Alternative cache component names that might be used
+    memcachedChunksCache:
+      enabled: false
+    memcachedResultsCache:
+      enabled: false
+    
+    # Additional cache configurations to try
+    lokiCanary:
+      enabled: true  # Keep canary for health checks
+    
+    # Try to explicitly set cache configurations
+    minio:
+      enabled: false
+    enterprise:
       enabled: false
     
     # Disable gateway and other resource-intensive components
