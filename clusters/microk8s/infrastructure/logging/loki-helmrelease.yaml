@@ -51,6 +51,26 @@ spec:
           ring:
             replication_factor: 1
       
+      # Storage configuration for SingleBinary mode
+      storage_config:
+        boltdb_shipper:
+          active_index_directory: /loki/boltdb-shipper-active
+          cache_location: /loki/boltdb-shipper-cache
+          shared_store: filesystem
+        filesystem:
+          directory: /loki/chunks
+
+      # Schema configuration
+      schema_config:
+        configs:
+          - from: 2020-10-24
+            store: boltdb-shipper
+            object_store: filesystem
+            schema: v11
+            index:
+              prefix: index_
+              period: 24h
+
       # Retention settings
       limits_config:
         retention_period: 168h  # 7 days
