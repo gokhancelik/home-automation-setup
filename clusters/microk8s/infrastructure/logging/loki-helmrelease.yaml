@@ -18,11 +18,9 @@ spec:
     # Lightweight configuration for Raspberry Pi
     deploymentMode: SingleBinary
     
-    loki:
-      # Disable multi-tenancy (single tenant mode)
-      auth_enabled: false
-      
-      # Minimal resource requirements
+    # Single binary mode components
+    singleBinary:
+      replicas: 1
       resources:
         requests:
           memory: 128Mi
@@ -30,24 +28,18 @@ spec:
         limits:
           memory: 256Mi
           cpu: 200m
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClass: ""  # Use default storage class
+    
+    loki:
+      # Disable multi-tenancy (single tenant mode)
+      auth_enabled: false
       
-      # Storage configuration for Pi
-      storage:
-        type: filesystem
-        filesystem:
-          chunks_directory: /var/loki/chunks
-          rules_directory: /var/loki/rules
-      
-      # Schema configuration
-      schemaConfig:
-        configs:
-          - from: "2024-04-01"
-            store: tsdb
-            object_store: filesystem
-            schema: v13
-            index:
-              prefix: loki_index_
-              period: 24h
+      # Common config - override the replication factor
+      commonConfig:
+        replication_factor: 1
       
       # Retention settings
       limits_config:
@@ -64,21 +56,6 @@ spec:
       replicas: 0
     backend:
       replicas: 0
-    
-    # Single binary mode components
-    singleBinary:
-      replicas: 1
-      resources:
-        requests:
-          memory: 128Mi
-          cpu: 100m
-        limits:
-          memory: 256Mi
-          cpu: 200m
-      persistence:
-        enabled: true
-        size: 10Gi
-        storageClass: ""  # Use default storage class
     
     # Disable other components for single binary mode
     ingester:
@@ -122,3 +99,21 @@ spec:
       enabled: false
     memcachedIndexWrites:
       enabled: false
+    
+    # Explicitly disable cache components for Raspberry Pi
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+    
+    # Disable gateway and other resource-intensive components
+    gateway:
+      enabled: true  # Keep minimal gateway
+      replicas: 1
+      resources:
+        requests:
+          memory: 32Mi
+          cpu: 50m
+        limits:
+          memory: 64Mi
+          cpu: 100m
