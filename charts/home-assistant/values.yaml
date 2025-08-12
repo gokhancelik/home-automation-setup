@@ -16,10 +16,6 @@ homeAssistant:
     frontend:
       themes: !include_dir_merge_named themes
 
-    automation: !include automations.yaml
-    script: !include scripts.yaml
-    scene: !include scenes.yaml
-
     # HTTP configuration
     http:
       use_x_forwarded_for: true
@@ -27,10 +23,6 @@ homeAssistant:
         - 10.0.0.0/8
         - 172.16.0.0/12
         - 192.168.0.0/16
-  
-  automations: "[]"  # Empty array for now
-  scripts: "{}"      # Empty object for now
-  scenes: "[]"       # Empty array for now
 
 secretRef:
   name: postgres-ha-secret

@@ -7,9 +7,3 @@ metadata:
 data:
   configuration.yaml: |
 {{ .Values.homeAssistant.configuration | indent 4 }}
-  automations.yaml: |
-{{ .Values.homeAssistant.automations | default "[]" | indent 4 }}
-  scripts.yaml: |
-{{ .Values.homeAssistant.scripts | default "{}" | indent 4 }}
-  scenes.yaml: |
-{{ .Values.homeAssistant.scenes | default "[]" | indent 4 }}
