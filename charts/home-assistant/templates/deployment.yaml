@@ -57,6 +57,27 @@ spec:
         volumeMounts:
         - name: shared-data
           mountPath: /shared
+      - name: install-hacs
+        image: alpine:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Install required packages
+          apk add --no-cache wget bash
+          
+          if [ ! -d "/config/custom_components/hacs" ]; then
+            echo "Installing HACS using official installer..."
+            cd /config
+            wget -O - https://get.hacs.xyz | bash -
+            echo "HACS installed successfully"
+          else
+            echo "HACS already installed, skipping..."
+          fi
+        volumeMounts:
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          mountPath: /config
+        {{- end }}
       containers:
       - name: home-assistant
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
