@@ -24,7 +24,8 @@ builder.Services
 
 // Add custom services
 builder.Services.AddSingleton<IDataStorageService, InfluxDbStorageService>();
-builder.Services.AddSingleton<IPredictiveAnalyticsService, PredictiveAnalyticsService>();
+// Temporarily disabled due to InfluxDB 1.x compatibility
+// builder.Services.AddSingleton<IPredictiveAnalyticsService, PredictiveAnalyticsService>();
 
 // Add CORS for development
 builder.Services.AddCors(options =>

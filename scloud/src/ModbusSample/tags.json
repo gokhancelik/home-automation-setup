@@ -1,0 +1,103 @@
+{
+  "Tags": {
+    "Conv1_RunCmd": {
+      "type": "coil",
+      "address": 0,
+      "description": "Conveyor 1 Run Command"
+    },
+    "Conv1_Running": {
+      "type": "discrete",
+      "address": 0,
+      "description": "Conveyor 1 Running Status"
+    },
+    "Conv2_RunCmd": {
+      "type": "coil",
+      "address": 1,
+      "description": "Conveyor 2 Run Command"
+    },
+    "Conv2_Running": {
+      "type": "discrete",
+      "address": 1,
+      "description": "Conveyor 2 Running Status"
+    },
+    "Motor1_Speed_Raw": {
+      "type": "holding",
+      "address": 40010,
+      "length": 2,
+      "datatype": "float",
+      "scale": 1.0,
+      "offset": 0.0,
+      "unit": "rpm",
+      "description": "Motor 1 Speed Setpoint"
+    },
+    "Motor1_Speed_Actual": {
+      "type": "input",
+      "address": 30010,
+      "length": 2,
+      "datatype": "float",
+      "scale": 1.0,
+      "offset": 0.0,
+      "unit": "rpm",
+      "description": "Motor 1 Actual Speed"
+    },
+    "Scale_Weight_Raw": {
+      "type": "input",
+      "address": 30020,
+      "length": 2,
+      "datatype": "float",
+      "scale": 1.0,
+      "offset": 0.0,
+      "unit": "kg",
+      "description": "Scale Weight Measurement"
+    },
+    "Temperature_1": {
+      "type": "input",
+      "address": 30030,
+      "length": 1,
+      "datatype": "int16",
+      "scale": 0.1,
+      "offset": -40.0,
+      "unit": "°C",
+      "description": "Temperature Sensor 1"
+    },
+    "Pressure_1": {
+      "type": "input",
+      "address": 30031,
+      "length": 1,
+      "datatype": "uint16",
+      "scale": 0.01,
+      "offset": 0.0,
+      "unit": "bar",
+      "description": "Pressure Sensor 1"
+    },
+    "Production_Count": {
+      "type": "holding",
+      "address": 40020,
+      "length": 2,
+      "datatype": "uint32",
+      "scale": 1.0,
+      "offset": 0.0,
+      "unit": "pieces",
+      "description": "Production Counter"
+    },
+    "System_Status": {
+      "type": "holding",
+      "address": 40000,
+      "length": 1,
+      "datatype": "uint16",
+      "scale": 1.0,
+      "offset": 0.0,
+      "description": "System Status Word"
+    },
+    "Emergency_Stop": {
+      "type": "discrete",
+      "address": 10,
+      "description": "Emergency Stop Status"
+    },
+    "Auto_Mode": {
+      "type": "coil",
+      "address": 10,
+      "description": "Auto Mode Enable"
+    }
+  }
+}

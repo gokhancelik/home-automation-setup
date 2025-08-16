@@ -112,12 +112,17 @@ public class MqttDataIngestionService : IDataIngestionService, IDisposable
             var topic = e.ApplicationMessage.Topic;
             var payload = e.ApplicationMessage.ConvertPayloadToString();
             
-            _logger.LogDebug("Received MQTT message on topic: {Topic}", topic);
+            _logger.LogInformation("MQTT message received on topic: {Topic} with payload length: {Length}", topic, payload.Length);
 
             var data = await ParseMessageAsync(topic, payload);
             if (data != null)
             {
+                _logger.LogInformation("Successfully parsed data for device: {DeviceId}", data.DeviceId);
                 DataReceived?.Invoke(this, new DeviceDataReceivedEventArgs(data, "MQTT"));
+            }
+            else
+            {
+                _logger.LogWarning("Failed to parse data from topic: {Topic}", topic);
             }
         }
         catch (Exception ex)
@@ -132,14 +137,19 @@ public class MqttDataIngestionService : IDataIngestionService, IDisposable
         {
             var topicParts = topic.Split('/');
             
+            _logger.LogInformation("Parsing message - Topic: {Topic}, Parts: [{Parts}], Payload: {Payload}", 
+                topic, string.Join(", ", topicParts), payload);
+            
             if (topicParts.Length < 3)
             {
-                _logger.LogWarning("Invalid topic format: {Topic}", topic);
+                _logger.LogWarning("Invalid topic format: {Topic} - Expected format: type/deviceId/messageType", topic);
                 return null;
             }
 
             var deviceId = topicParts[1];
             var messageType = topicParts[2];
+
+            _logger.LogInformation("Processing message type '{MessageType}' for device '{DeviceId}'", messageType, deviceId);
 
             switch (messageType.ToLowerInvariant())
             {
@@ -159,7 +169,7 @@ public class MqttDataIngestionService : IDataIngestionService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to parse message payload");
+            _logger.LogError(ex, "Failed to parse message payload for topic: {Topic}", topic);
             return null;
         }
     }

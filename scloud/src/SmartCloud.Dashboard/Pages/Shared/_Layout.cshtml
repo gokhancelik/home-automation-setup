@@ -108,7 +108,60 @@
     <script src="_framework/blazor.server.js"></script>
     
     <!-- SignalR -->
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    
+    <!-- SignalR Dashboard Connection -->
+    <script>
+        let connection = null;
+        let dotNetHelper = null;
+
+        window.initializeSignalR = async (helper) => {
+            try {
+                dotNetHelper = helper;
+                
+                connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/dashboardhub")
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Handle incoming data updates
+                connection.on("ReceiveData", (data) => {
+                    if (dotNetHelper) {
+                        dotNetHelper.invokeMethodAsync("ReceiveData", data);
+                    }
+                });
+
+                // Handle incoming alarm updates
+                connection.on("ReceiveAlarm", (alarm) => {
+                    if (dotNetHelper) {
+                        dotNetHelper.invokeMethodAsync("ReceiveAlarm", alarm);
+                    }
+                });
+
+                // Handle incoming prediction updates
+                connection.on("ReceivePrediction", (prediction) => {
+                    console.log("Received prediction:", prediction);
+                });
+
+                await connection.start();
+                console.log("SignalR Connected for Dashboard");
+            } catch (err) {
+                console.error("SignalR Connection Error:", err);
+            }
+        };
+
+        window.disposeSignalR = async () => {
+            try {
+                if (connection) {
+                    await connection.stop();
+                    connection = null;
+                }
+                dotNetHelper = null;
+            } catch (err) {
+                console.error("SignalR Disposal Error:", err);
+            }
+        };
+    </script>
     
     <div id="blazor-error-ui">
         <environment include="Staging,Production">

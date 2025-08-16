@@ -45,8 +45,8 @@ public class GatewayWorker : BackgroundService
             // Start data ingestion
             await _dataIngestionService.StartAsync(stoppingToken);
 
-            // Start analytics processing
-            _ = Task.Run(() => ProcessAnalytics(stoppingToken), stoppingToken);
+            // Start analytics processing (disabled due to InfluxDB 1.x compatibility)
+            // _ = Task.Run(() => ProcessAnalytics(stoppingToken), stoppingToken);
 
             _logger.LogInformation("SmartCloud Gateway Worker started successfully");
 
@@ -103,14 +103,20 @@ public class GatewayWorker : BackgroundService
             // Send to dashboard if connected
             if (_dashboardConnection?.State == HubConnectionState.Connected && e.Data is PlcData plcData)
             {
+                _logger.LogInformation("Sending data to dashboard via SignalR for device: {DeviceId}", plcData.DeviceId);
                 await _dashboardConnection.SendAsync("SendDataUpdate", plcData);
             }
+            else
+            {
+                _logger.LogWarning("Dashboard connection not available - State: {State}, Data Type: {DataType}", 
+                    _dashboardConnection?.State, e.Data.GetType().Name);
+            }
 
-            // Check for anomalies if it's PLC data
-            if (e.Data is PlcData data)
+            // Check for anomalies if it's PLC data (disabled due to InfluxDB 1.x compatibility)
+            /*if (e.Data is PlcData data)
             {
                 await CheckForAnomalies(data);
-            }
+            }*/
         }
         catch (Exception ex)
         {

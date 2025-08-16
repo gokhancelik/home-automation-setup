@@ -2,7 +2,9 @@
 @using SmartCloud.Core.Interfaces
 @using SmartCloud.Core.Models
 @inject IDataStorageService StorageService
-@inject IPredictiveAnalyticsService AnalyticsService
+@inject IJSRuntime JSRuntime
+@* @inject IPredictiveAnalyticsService AnalyticsService *@
+@implements IAsyncDisposable
 
 <h1>Smart Cloud - Industrial IoT Dashboard</h1>
 
@@ -184,32 +186,106 @@
         await LoadDashboardData();
     }
 
-    private async Task LoadDashboardData()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Initialize SignalR connection for real-time data
+            await InitializeSignalRConnection();
+        }
+    }
+
+    private async Task InitializeSignalRConnection()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("initializeSignalR", 
+                DotNetObjectReference.Create(this));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing SignalR: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task ReceiveData(PlcData data)
+    {
+        try
+        {
+            // Add new data to the beginning of the list
+            recentPlcData.Insert(0, data);
+            
+            // Keep only the latest 20 entries
+            if (recentPlcData.Count > 20)
+            {
+                recentPlcData = recentPlcData.Take(20).ToList();
+            }
+            
+            // Update statistics
+            activeMachines = recentPlcData.Select(d => d.DeviceId).Distinct().Count();
+            dataPointsToday = recentPlcData.Count;
+            
+            // Calculate overall efficiency (simple average of running devices)
+            var runningDevices = recentPlcData.Where(d => d.Status == DeviceStatus.Online).Count();
+            overallEfficiency = recentPlcData.Any() ? (runningDevices * 100.0 / recentPlcData.Count) : 0;
+            
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error receiving data: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task ReceiveAlarm(Alarm alarm)
+    {
+        try
+        {
+            activeAlarms++;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error receiving alarm: {ex.Message}");
+        }
+    }
+
+    private Task LoadDashboardData()
     {
         try
         {
             // Load recent data for sample devices
             var deviceIds = new[] { "PLC001", "PLC002", "PLC003" };
-            var endTime = DateTime.UtcNow;
-            var startTime = endTime.AddHours(-1);
 
             foreach (var deviceId in deviceIds)
             {
-                // Generate sample predictions
-                var prediction = await AnalyticsService.PredictMaintenanceAsync(deviceId);
-                maintenancePredictions.Add(prediction);
+                // Generate sample predictions for demonstration
+                var samplePrediction = new MaintenancePrediction
+                {
+                    DeviceId = deviceId,
+                    ComponentName = "Main Motor",
+                    PredictedFailureProbability = 0.15 + (new Random().NextDouble() * 0.3),
+                    PredictedFailureDate = DateTime.UtcNow.AddDays(30 + new Random().Next(60)),
+                    ConfidenceScore = 0.8 + (new Random().NextDouble() * 0.2),
+                    RecommendedActions = new[] { "Schedule lubrication", "Check vibration levels" }
+                };
+                maintenancePredictions.Add(samplePrediction);
             }
             
-            // Update summary statistics
+            // Initial summary statistics (will be updated by real-time data)
             activeMachines = deviceIds.Length;
-            overallEfficiency = 95.0; // Sample data
-            dataPointsToday = 1250; // Sample data
+            overallEfficiency = 95.0;
+            dataPointsToday = 0; // Will be updated by real-time data
             
             StateHasChanged();
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+            return Task.CompletedTask;
         }
     }
 
@@ -248,5 +324,17 @@
             > 0.4 => "warning",
             _ => "success"
         };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("disposeSignalR");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
     }
 }

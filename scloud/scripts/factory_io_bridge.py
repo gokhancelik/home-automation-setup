@@ -12,11 +12,13 @@ from typing import Dict, Any
 
 try:
     from pymodbus.client.sync import ModbusTcpClient
-    from paho.mqtt import client as mqtt_client
+    import paho.mqtt.client as mqtt_client
     DEPENDENCIES_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     DEPENDENCIES_AVAILABLE = False
-    print("Missing dependencies. Install with: pip install pymodbus paho-mqtt")
+    mqtt_client = None
+    print(f"Missing dependencies: {e}")
+    print("Install with: pip install pymodbus paho-mqtt")
 
 # Configure logging
 logging.basicConfig(
@@ -35,6 +37,9 @@ class FactoryIoMqttBridge:
                  mqtt_port: int = 1883,
                  update_interval: float = 1.0):
         
+        if not DEPENDENCIES_AVAILABLE:
+            raise ImportError("Required dependencies not available")
+            
         self.modbus_host = modbus_host
         self.modbus_port = modbus_port
         self.mqtt_host = mqtt_host
@@ -243,7 +248,11 @@ class FactoryIoMqttBridge:
 def main():
     """Main entry point"""
     bridge = FactoryIoMqttBridge(
-        update_interval=2.0  # Update every 2 seconds
+        modbus_host="127.0.0.1",        # Factory I/O on localhost
+        modbus_port=502,                # Standard Modbus TCP port
+        mqtt_host="192.168.68.83",      # Your K8s MQTT broker
+        mqtt_port=31883,                # Your K8s MQTT port
+        update_interval=2.0             # Update every 2 seconds
     )
     
     try:
