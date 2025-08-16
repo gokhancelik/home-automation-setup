@@ -38,6 +38,8 @@ spec:
         - name: containers
           mountPath: /run/containerd/io.containerd.runtime.v2.task/k8s.io
           readOnly: true
+        - name: positions
+          mountPath: /tmp/positions
         env:
         - name: HOSTNAME
           valueFrom:
@@ -48,7 +50,7 @@ spec:
           runAsGroup: 0
           privileged: false
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           capabilities:
             drop:
             - ALL
@@ -65,6 +67,8 @@ spec:
       - name: containers
         hostPath:
           path: /run/containerd/io.containerd.runtime.v2.task/k8s.io
+      - name: positions
+        emptyDir: {}
       tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
@@ -114,10 +118,15 @@ data:
       log_level: info
 
     positions:
-      filename: /tmp/positions.yaml
+      filename: /tmp/positions/positions.yaml
 
     clients:
-      - url: http://loki:3100/loki/api/v1/push
+      - url: http://loki-gateway:80/loki/api/v1/push
+        timeout: 30s
+        backoff_config:
+          min_period: 500ms
+          max_period: 5m
+          max_retries: 10
 
     scrape_configs:
     # Kubernetes pod logs
@@ -191,20 +200,5 @@ data:
         - __meta_kubernetes_pod_container_name
         target_label: __path__
 
-    # System logs  
-    - job_name: syslog
-      static_configs:
-      - targets:
-        - localhost
-        labels:
-          job: syslog
-          __path__: /var/log/syslog
-
-    # Kubernetes audit logs
-    - job_name: kubernetes-audit
-      static_configs:
-      - targets:
-        - localhost
-        labels:
-          job: kubernetes-audit
-          __path__: /var/log/audit/*.log
+    # Focus on Kubernetes pod logs only for now
+    # Syslog and audit logs removed due to permission issues
