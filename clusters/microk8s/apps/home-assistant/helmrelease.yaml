@@ -32,18 +32,34 @@ spec:
       size: 5Gi
       storageClass: ssd-storage
     
-    secretRef:
-      name: postgres-ha-secret
-    
     # Home Assistant configuration with Matter support
     homeAssistant:
       configuration: |
         # Loads default set of integrations. Do not remove.
         default_config:
 
-        # Database configuration
-        recorder:
-          db_url: !env_var DATABASE_URL
+        # InfluxDB configuration for time-series data
+        influxdb:
+          host: influxdb.influxdb.svc.cluster.local
+          port: 8086
+          database: iot_sensors
+          username: iot_user
+          password: iot_user_pass123
+          max_retries: 3
+          default_measurement: state
+          include:
+            entities:
+              - sensor.*
+              - binary_sensor.*
+              - switch.*
+              - light.*
+              - climate.*
+              - weather.*
+          exclude:
+            entities:
+              - sensor.uptime
+              - sensor.date
+              - sensor.time
 
         # Load frontend themes from the themes folder
         frontend:
