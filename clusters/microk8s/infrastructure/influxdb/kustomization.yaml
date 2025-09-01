@@ -6,7 +6,7 @@ namespace: influxdb
 resources:
   - namespace.yaml
   - influxdb-configmap.yaml
-  - influxdb-auth-sealed.yaml
+  - influxdb-auth-temp-secret.yaml
   - influxdb-pvc.yaml
   - influxdb-deployment.yaml
   - influxdb-service.yaml
