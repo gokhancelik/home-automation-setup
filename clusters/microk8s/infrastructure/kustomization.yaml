@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - nginx
   - cert-manager
-  - sealed-secrets
+  # Temporarily disabled to clean up conflicting state
+  # - sealed-secrets
   - logging
   - mqtt
   - redis
