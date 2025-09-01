@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - nginx
   - cert-manager
-  - sealed-secrets
+  # Removing sealed-secrets completely to start fresh
+  # - sealed-secrets
   - logging
   - mqtt
   - redis
