@@ -16,11 +16,14 @@ spec:
   install:
     remediation:
       retries: 3
+    replace: true
   upgrade:
     remediation:
       retries: 3
       remediateLastFailure: true
     force: true
+  uninstall:
+    keepHistory: false
   values:
     # Use default naming to avoid conflicts
     serviceAccount:
