@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - helmrelease.yaml
-  # Temporarily disabled until sealed-secrets controller is installed
-  # - cloudflare-api-token-sealed-secret.yaml
-  # - cluster-issuer.yaml
+  - cloudflare-api-token-sealed-secret.yaml
+  - cluster-issuer.yaml
