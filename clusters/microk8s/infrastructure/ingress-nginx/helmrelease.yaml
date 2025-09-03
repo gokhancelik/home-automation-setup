@@ -36,4 +36,4 @@ spec:
         enabled: true
         timeoutSeconds: 30
     defaultBackend:
-      enabled: false
+      enabled: true
