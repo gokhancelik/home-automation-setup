@@ -8,3 +8,4 @@ resources:
   - elastic.yaml
   - fluent.yaml
   - grafana.yaml
+  - influxdata.yaml

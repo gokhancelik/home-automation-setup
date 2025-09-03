@@ -1,0 +1,91 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: influxdb
+  namespace: data-storage
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: influxdb2
+      version: 2.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: influxdata
+        namespace: flux-system
+      interval: 15m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # InfluxDB 2.x configuration
+    image:
+      repository: influxdb
+      tag: "2.7-alpine"
+      pullPolicy: IfNotPresent
+
+    # Admin user configuration
+    adminUser:
+      organization: "home-automation"
+      bucket: "home-assistant"
+      user: "admin"
+      retention_policy: "30d"
+      # Credentials from sealed secret
+      existingSecret: "influxdb-admin"
+
+    # Persistence configuration
+    persistence:
+      enabled: true
+      storageClass: "ssd"
+      size: 20Gi
+      accessMode: ReadWriteOnce
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 8086
+      targetPort: 8086
+
+    # Resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+    # Security context
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    # Health checks
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    # Enable backup (optional)
+    backup:
+      enabled: false
+
+    # Metrics (for Prometheus)
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: false  # Will enable later with monitoring stack
