@@ -4,6 +4,7 @@ resources:
   - bitnami.yaml
   - ingress-nginx.yaml
   - cert-manager.yaml
+  - sealed-secrets.yaml
   - elastic.yaml
   - fluent.yaml
   - grafana.yaml
