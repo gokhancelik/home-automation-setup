@@ -36,8 +36,6 @@ spec:
       retention_policy: "30d"
       # Credentials from sealed secret
       existingSecret: "influxdb-admin"
-      passwordKey: "password"
-      tokenKey: "token"
 
     # Persistence configuration
     persistence:
