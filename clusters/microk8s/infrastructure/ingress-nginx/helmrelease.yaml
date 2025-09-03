@@ -24,10 +24,8 @@ spec:
   values:
     controller:
       service:
-        type: NodePort
-        nodePorts:
-          http: 30080
-          https: 30443
+        type: LoadBalancer
+        externalTrafficPolicy: Local
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
@@ -35,6 +33,7 @@ spec:
       metrics:
         enabled: false
       admissionWebhooks:
-        enabled: false
+        enabled: true
+        timeoutSeconds: 30
     defaultBackend:
       enabled: false
