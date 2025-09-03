@@ -30,6 +30,7 @@ spec:
           longitude: $LONGITUDE
           timezone: $TIMEZONE
           location_name: $LOCATION_NAME
+          influxdb_token: $INFLUXDB_TOKEN
           EOF
         env:
         - name: API_PASSWORD
@@ -57,6 +58,11 @@ spec:
             secretKeyRef:
               name: home-assistant-config
               key: location-name
+        - name: INFLUXDB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: influxdb-token
         volumeMounts:
         - name: config
           mountPath: /config

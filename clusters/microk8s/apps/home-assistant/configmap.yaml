@@ -34,7 +34,7 @@ data:
       api_version: 2
       host: influxdb-influxdb2.data-storage.svc.cluster.local
       port: 8086
-      token: influxdb-admin-token-2025-secure
+      token: !secret influxdb_token
       organization: home-automation
       bucket: home-assistant
       max_retries: 3
