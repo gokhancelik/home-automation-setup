@@ -24,15 +24,10 @@ spec:
   values:
     controller:
       service:
-        type: ClusterIP
-      containerPort:
-        http: 80
-        https: 443
-      hostPort:
-        enabled: true
-        ports:
-          http: 80
-          https: 443
+        type: NodePort
+        nodePorts:
+          http: 30080
+          https: 30443
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
