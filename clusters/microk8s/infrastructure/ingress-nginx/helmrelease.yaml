@@ -24,8 +24,15 @@ spec:
   values:
     controller:
       service:
-        type: LoadBalancer
-        externalTrafficPolicy: Local
+        type: ClusterIP
+      containerPort:
+        http: 80
+        https: 443
+      hostPort:
+        enabled: true
+        ports:
+          http: 80
+          https: 443
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
