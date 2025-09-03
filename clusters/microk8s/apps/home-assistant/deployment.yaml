@@ -24,7 +24,7 @@ spec:
         - /bin/sh
         - -c
         - |
-          cat > /config/secrets.yaml << 'EOF'
+          cat > /config/secrets.yaml << EOF
           api_password: $API_PASSWORD
           latitude: $LATITUDE
           longitude: $LONGITUDE
