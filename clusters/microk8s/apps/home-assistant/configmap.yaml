@@ -29,13 +29,14 @@ data:
         - 172.16.0.0/12
       api_password: !secret api_password
       
-    # InfluxDB integration for time-series data
+    # InfluxDB v2 integration for time-series data
     influxdb:
+      api_version: 2
       host: influxdb-influxdb2.data-storage.svc.cluster.local
       port: 8086
-      database: home-assistant
-      username: admin
-      password: influxdb-admin-password-2025
+      token: influxdb-admin-token-2025-secure
+      organization: home-automation
+      bucket: home-assistant
       max_retries: 3
       default_measurement: state
       exclude:
