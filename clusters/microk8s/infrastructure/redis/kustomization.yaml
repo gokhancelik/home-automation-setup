@@ -6,7 +6,7 @@ namespace: redis
 resources:
   - namespace.yaml
   - redis-configmap.yaml
-  - redis-auth-sealed.yaml
+  - redis-secret.yaml
   - redis-pvc.yaml
   - redis-deployment.yaml
   - redis-service.yaml
