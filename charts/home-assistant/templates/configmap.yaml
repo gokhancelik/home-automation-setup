@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "home-assistant.fullname" . }}-config
+  labels:
+    {{- include "home-assistant.labels" . | nindent 4 }}
+data:
+  configuration.yaml: |
+{{ .Values.homeAssistant.configuration | indent 4 }}
+  automations.yaml: |
+    # Automations will be configured here
+    []
+  scripts.yaml: |
+    # Scripts will be configured here
+    {}
+  scenes.yaml: |
+    # Scenes will be configured here
+    []
