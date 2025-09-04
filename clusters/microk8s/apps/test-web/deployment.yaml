@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-web
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-web
+  template:
+    metadata:
+      labels:
+        app: test-web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: test-web-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-web
+  namespace: test
+spec:
+  selector:
+    app: test-web
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
