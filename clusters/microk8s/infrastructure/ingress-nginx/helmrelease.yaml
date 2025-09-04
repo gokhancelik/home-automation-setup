@@ -23,9 +23,10 @@ spec:
       retries: 3
   values:
     controller:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       service:
-        type: LoadBalancer
-        externalTrafficPolicy: Local
+        type: ClusterIP
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
