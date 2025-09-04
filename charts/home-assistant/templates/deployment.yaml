@@ -34,6 +34,11 @@ spec:
           api_password: $API_PASSWORD
           influxdb_token: $INFLUXDB_TOKEN
           EOF
+          
+          # Create empty automation files if they don't exist
+          touch /config/automations.yaml
+          touch /config/scripts.yaml
+          touch /config/scenes.yaml
         env:
         - name: LATITUDE
           valueFrom:
