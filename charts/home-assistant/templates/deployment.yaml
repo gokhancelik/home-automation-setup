@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant
+  namespace: home-automation
+  labels:
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/instance: home-assistant
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: home-assistant
+      app.kubernetes.io/instance: home-assistant
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: home-assistant
+        app.kubernetes.io/instance: home-assistant
+    spec:
+      containers:
+      - name: home-assistant
+        image: "homeassistant/home-assistant:2025.8.3"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8123
+          name: http
+          protocol: TCP
+        env:
+        - name: TZ
+          value: "Europe/Amsterdam"
+        volumeMounts:
+        - name: data
+          mountPath: /config
+        - name: configuration
+          mountPath: /config/configuration.yaml
+          subPath: configuration.yaml
+          readOnly: true
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: home-assistant-data
+      - name: configuration
+        configMap:
+          name: home-assistant-config
