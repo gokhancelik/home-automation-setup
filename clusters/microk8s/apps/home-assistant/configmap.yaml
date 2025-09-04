@@ -27,6 +27,7 @@ data:
         - 10.0.0.0/8
         - 192.168.0.0/16
         - 172.16.0.0/12
+      external_url: https://ha.gcelik.dev
       
     # InfluxDB v2 integration for time-series data
     influxdb:
