@@ -20,6 +20,49 @@ spec:
         app.kubernetes.io/name: home-assistant
         app.kubernetes.io/instance: home-assistant
     spec:
+      initContainers:
+      - name: setup-secrets
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        - -c
+        - |
+          cat > /config/secrets.yaml << EOF
+          latitude: $LATITUDE
+          longitude: $LONGITUDE
+          timezone: $TIMEZONE
+          api_password: $API_PASSWORD
+          influxdb_token: $INFLUXDB_TOKEN
+          EOF
+        env:
+        - name: LATITUDE
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: latitude
+        - name: LONGITUDE
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: longitude
+        - name: TIMEZONE
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: timezone
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: api-password
+        - name: INFLUXDB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: home-assistant-config
+              key: influxdb-token
+        volumeMounts:
+        - name: data
+          mountPath: /config
       containers:
       - name: home-assistant
         image: "homeassistant/home-assistant:2025.8.3"
