@@ -27,6 +27,9 @@ data:
         - 10.0.0.0/8
         - 192.168.0.0/16
         - 172.16.0.0/12
+      server_host: 0.0.0.0
+      cors_allowed_origins:
+        - https://ha.gcelik.dev
       
     # InfluxDB v2 integration for time-series data
     influxdb:
