@@ -1,0 +1,119 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home-automation
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/home-assistant
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+      interval: 1m
+  values:
+    image:
+      repository: homeassistant/home-assistant
+      tag: "2025.8.3"
+      pullPolicy: IfNotPresent
+    
+    homeAssistant:
+      configuration: |
+        # Loads default set of integrations. Do not remove.
+        default_config:
+
+        # Core configuration
+        homeassistant:
+          name: Home
+          latitude: !secret latitude
+          longitude: !secret longitude
+          elevation: 0
+          unit_system: metric
+          time_zone: !secret timezone
+          country: NL
+
+        # HTTP configuration
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+
+        # InfluxDB v2 integration for time-series data
+        influxdb:
+          api_version: 2
+          host: influxdb-influxdb2.data-storage.svc.cluster.local
+          port: 8086
+          ssl: false
+          verify_ssl: false
+          token: !secret influxdb_token
+          organization: home-automation
+          bucket: home-assistant
+          max_retries: 3
+          default_measurement: state
+          exclude:
+            entities:
+              - zone.home
+            domains:
+              - automation
+              - updater
+          include:
+            domains:
+              - sensor
+              - binary_sensor
+              - switch
+              - light
+              - device_tracker
+              - climate
+              - weather
+
+        # Recorder (local database)
+        recorder:
+          purge_keep_days: 10
+          commit_interval: 1
+          db_url: "sqlite:////config/home-assistant_v2.db"
+
+        # Logger configuration
+        logger:
+          default: info
+          logs:
+            homeassistant.components.influxdb: debug
+
+        # Automation
+        automation: !include automations.yaml
+
+        # Scripts
+        script: !include scripts.yaml
+
+        # Scenes
+        scene: !include scenes.yaml
+
+    secretRef:
+      name: home-assistant-config
+
+    env:
+      TZ: "Europe/Amsterdam"
+
+    ingress:
+      enabled: true
+      className: nginx
+      host: ha.gcelik.dev
+      tls:
+        enabled: true
+        secretName: home-assistant-tls
+
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: ssd-storage
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
