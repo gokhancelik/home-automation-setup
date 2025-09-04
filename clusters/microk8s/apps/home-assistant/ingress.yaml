@@ -4,7 +4,6 @@ metadata:
   name: home-assistant
   namespace: home-automation
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
@@ -13,8 +12,6 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header Accept-Encoding "";
-      sub_filter_once off;
-      sub_filter_types text/css text/javascript application/javascript;
     nginx.ingress.kubernetes.io/upstream-hash-by: "$arg_username"
 spec:
   ingressClassName: nginx
