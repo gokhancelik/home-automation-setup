@@ -24,11 +24,11 @@ spec:
   values:
     controller:
       service:
-        type: LoadBalancer
+        type: NodePort
         externalTrafficPolicy: Local
         nodePorts:
-          http: 80
-          https: 443
+          http: 30080
+          https: 30443
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
