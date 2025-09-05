@@ -42,5 +42,5 @@ spec:
       enabled: true
       image:
         registry: registry.k8s.io
-        image: defaultbackend-arm64
+        image: defaultbackend-amd64
         tag: "1.5"
