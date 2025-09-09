@@ -86,6 +86,9 @@ spec:
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
           readOnly: true
+        - name: tls-secret
+          mountPath: /ssl
+          readOnly: true
       volumes:
       - name: data
         persistentVolumeClaim:
@@ -93,3 +96,6 @@ spec:
       - name: configuration
         configMap:
           name: home-assistant-config
+      - name: tls-secret
+        secret:
+          secretName: home-assistant-tls
