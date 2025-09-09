@@ -110,6 +110,16 @@ spec:
         enabled: true
         secretName: home-assistant-tls
 
+    extraVolumes:
+      - name: tls-secret
+        secret:
+          secretName: home-assistant-tls
+
+    extraVolumeMounts:
+      - name: tls-secret
+        mountPath: /ssl
+        readOnly: true
+
     persistence:
       enabled: true
       size: 5Gi
