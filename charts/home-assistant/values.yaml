@@ -25,6 +25,8 @@ homeAssistant:
       unit_system: metric
       time_zone: !secret timezone
       country: NL
+      external_url: https://ha.gcelik.dev
+      internal_url: https://192.168.2.109:30443
 
     # HTTP configuration
     http:
