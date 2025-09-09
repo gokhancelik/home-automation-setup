@@ -12,6 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
+      version: 0.8.2
       interval: 1m
   values:
     image:
