@@ -41,6 +41,11 @@ spec:
             - 10.0.0.0/8
             - 172.16.0.0/12
             - 192.168.0.0/16
+          base_url: https://ha.gcelik.dev
+          server_host: 0.0.0.0
+          server_port: 8123
+          ssl_certificate: /ssl/tls.crt
+          ssl_key: /ssl/tls.key
 
         # InfluxDB v2 integration for time-series data
         influxdb:
