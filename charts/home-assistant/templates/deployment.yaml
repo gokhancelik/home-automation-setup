@@ -34,6 +34,9 @@ spec:
             # Create custom_components directory if it doesn't exist
             mkdir -p /config/custom_components
             
+            # Remove any existing hacs directory
+            rm -rf /config/custom_components/hacs
+            
             # Clone HACS repository to a temporary location
             cd /tmp
             git clone https://github.com/hacs/integration.git hacs_repo

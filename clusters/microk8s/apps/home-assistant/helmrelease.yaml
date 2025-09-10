@@ -12,7 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 0.9.1
+      version: 0.9.2
       interval: 1m
   values:
     image:
