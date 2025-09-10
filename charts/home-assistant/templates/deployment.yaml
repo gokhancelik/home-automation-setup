@@ -28,18 +28,21 @@ spec:
         - -c
         - |
           # Check if HACS is already installed
-          if [ ! -d "/config/custom_components/hacs" ]; then
+          if [ ! -f "/config/custom_components/hacs/manifest.json" ]; then
             echo "HACS not found, installing..."
             
             # Create custom_components directory if it doesn't exist
             mkdir -p /config/custom_components
             
-            # Clone HACS repository
-            cd /config/custom_components
-            git clone https://github.com/hacs/integration.git hacs
+            # Clone HACS repository to a temporary location
+            cd /tmp
+            git clone https://github.com/hacs/integration.git hacs_repo
             
-            # Remove .git directory to save space
-            rm -rf hacs/.git
+            # Move the actual HACS files to the correct location
+            mv hacs_repo/custom_components/hacs /config/custom_components/
+            
+            # Clean up temporary files
+            rm -rf /tmp/hacs_repo
             
             echo "HACS installed successfully"
           else
