@@ -21,6 +21,33 @@ spec:
         app.kubernetes.io/instance: home-assistant
     spec:
       initContainers:
+      - name: install-hacs
+        image: alpine/git:2.43.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Check if HACS is already installed
+          if [ ! -d "/config/custom_components/hacs" ]; then
+            echo "HACS not found, installing..."
+            
+            # Create custom_components directory if it doesn't exist
+            mkdir -p /config/custom_components
+            
+            # Clone HACS repository
+            cd /config/custom_components
+            git clone https://github.com/hacs/integration.git hacs
+            
+            # Remove .git directory to save space
+            rm -rf hacs/.git
+            
+            echo "HACS installed successfully"
+          else
+            echo "HACS already installed, skipping"
+          fi
+        volumeMounts:
+        - name: data
+          mountPath: /config
       - name: setup-secrets
         image: busybox:1.36
         command:
@@ -39,6 +66,11 @@ spec:
           touch /config/automations.yaml
           touch /config/scripts.yaml
           touch /config/scenes.yaml
+          
+          # Create directories for HACS and themes
+          mkdir -p /config/themes
+          mkdir -p /config/www
+          mkdir -p /config/custom_components
         env:
         - name: LATITUDE
           valueFrom:

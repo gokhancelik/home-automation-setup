@@ -38,6 +38,14 @@ homeAssistant:
       server_host: 0.0.0.0
       server_port: 8123
 
+    # HACS (Home Assistant Community Store)
+    # After installation, go to Configuration -> Integrations and add HACS
+    # You'll need a GitHub Personal Access Token for HACS setup
+
+    # Frontend configuration for HACS
+    frontend:
+      themes: !include_dir_merge_named themes
+
     # InfluxDB v2 integration for time-series data
     influxdb:
       api_version: 2

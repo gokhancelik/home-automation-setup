@@ -1,6 +1,6 @@
 apiVersion: v2
 name: home-assistant
-description: A custom Helm chart for Home Assistant with InfluxDB support
+description: A custom Helm chart for Home Assistant with InfluxDB support and HACS integration
 type: application
-version: 0.8.4
+version: 0.9.0
 appVersion: "2025.8.3"
