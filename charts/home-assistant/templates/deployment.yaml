@@ -122,8 +122,6 @@ spec:
         env:
         - name: TZ
           value: "Europe/Amsterdam"
-        securityContext:
-          privileged: true
         volumeMounts:
         - name: data
           mountPath: /config
@@ -131,9 +129,6 @@ spec:
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
           readOnly: true
-        - name: usb-devices
-          mountPath: /dev
-          readOnly: false
       - name: matter-server
         image: ghcr.io/home-assistant-libs/python-matter-server:stable
         ports:
@@ -164,6 +159,3 @@ spec:
       - name: configuration
         configMap:
           name: home-assistant-config
-      - name: usb-devices
-        hostPath:
-          path: /dev

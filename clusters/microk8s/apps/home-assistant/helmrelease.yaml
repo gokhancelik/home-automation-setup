@@ -12,7 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.0.2
+      version: 1.0.0
       interval: 1m
   values:
     image:
@@ -62,12 +62,6 @@ spec:
           
         # Thread integration for Matter over Thread
         thread:
-
-        # ZHA (Zigbee Home Automation) for Aqara and other Zigbee devices
-        # Requires a Zigbee coordinator (USB dongle) connected to the system
-        zha:
-          # Configuration will be done through the UI after adding the integration
-          # Supported coordinators: ConBee II, Sonoff ZBDongle-E, SkyConnect, etc.
 
         # InfluxDB v2 integration for time-series data
         influxdb:
