@@ -55,11 +55,6 @@ spec:
         frontend:
           themes: !include_dir_merge_named themes
 
-        # ZHA (Zigbee Home Automation) for Aqara and other Zigbee devices
-        # Requires a Zigbee coordinator (USB dongle) connected to the system
-        zha:
-          # Configuration will be done through the UI after adding the integration
-          # Supported coordinators: ConBee II, Sonoff ZBDongle-P, SkyConnect, etc.
 
         # HomeKit Bridge - Expose Home Assistant devices to Apple HomeKit
         # This allows Zigbee devices (like Aqara FP2) to work with HomeKit
@@ -113,9 +108,18 @@ spec:
 
         # Recorder (local database)
         recorder:
-          purge_keep_days: 10
-          commit_interval: 1
+          purge_keep_days: 1
+          commit_interval: 5
           db_url: "sqlite:////config/home-assistant_v2.db"
+          include:
+            domains:
+              - automation
+              - script
+              - person
+              - updater
+            entity_globs:
+              - "automation.*"
+              - "script.*"
 
         # Logger configuration
         logger:
