@@ -82,11 +82,6 @@ spec:
                 - sensor.uptime
                 - sensor.date
                 - sensor.time
-            entity_config:
-              # Configure specific devices for HomeKit if needed
-              binary_sensor.aqara_fp2_presence:
-                name: "Room Presence"
-                type: "motion"
 
         # InfluxDB v2 integration for time-series data
         influxdb:
