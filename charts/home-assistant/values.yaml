@@ -46,6 +46,20 @@ homeAssistant:
     frontend:
       themes: !include_dir_merge_named themes
 
+    # Matter (Thread/Matter) integration for smart home interoperability
+    # Matter Server will run as a sidecar container
+    matter:
+      url: ws://localhost:5580/ws
+      
+    # Thread integration for Matter over Thread
+    thread:
+
+    # ZHA (Zigbee Home Automation) for Aqara and other Zigbee devices
+    # Requires a Zigbee coordinator (USB dongle) connected to the system
+    zha:
+      # Configuration will be done through the UI after adding the integration
+      # Supported coordinators: ConBee II, Sonoff ZBDongle-E, SkyConnect, etc.
+
     # InfluxDB v2 integration for time-series data
     influxdb:
       api_version: 2

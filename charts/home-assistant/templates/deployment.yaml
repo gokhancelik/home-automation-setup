@@ -22,7 +22,7 @@ spec:
     spec:
       initContainers:
       - name: install-hacs
-        image: alpine/git:2.43.0
+        image: alpine:3.18
         command:
         - /bin/sh
         - -c
@@ -31,21 +31,26 @@ spec:
           if [ ! -f "/config/custom_components/hacs/manifest.json" ]; then
             echo "HACS not found, installing..."
             
+            # Install required packages
+            apk add --no-cache wget unzip
+            
             # Create custom_components directory if it doesn't exist
             mkdir -p /config/custom_components
             
             # Remove any existing hacs directory
             rm -rf /config/custom_components/hacs
             
-            # Clone HACS repository to a temporary location
+            # Download latest HACS release
             cd /tmp
-            git clone https://github.com/hacs/integration.git hacs_repo
+            wget -q https://github.com/hacs/integration/releases/latest/download/hacs.zip
+            unzip -q hacs.zip
             
-            # Move the actual HACS files to the correct location
-            mv hacs_repo/custom_components/hacs /config/custom_components/
+            # Move HACS files to correct location
+            mkdir -p /config/custom_components/hacs
+            mv *.py *.json hacs_frontend repositories translations utils validate websocket /config/custom_components/hacs/ 2>/dev/null || true
             
-            # Clean up temporary files
-            rm -rf /tmp/hacs_repo
+            # Clean up
+            rm -f hacs.zip
             
             echo "HACS installed successfully"
           else
@@ -117,6 +122,8 @@ spec:
         env:
         - name: TZ
           value: "Europe/Amsterdam"
+        securityContext:
+          privileged: true
         volumeMounts:
         - name: data
           mountPath: /config
@@ -124,6 +131,32 @@ spec:
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
           readOnly: true
+        - name: usb-devices
+          mountPath: /dev
+          readOnly: false
+      - name: matter-server
+        image: ghcr.io/home-assistant-libs/python-matter-server:stable
+        ports:
+        - containerPort: 5580
+          name: matter-ws
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+          subPath: matter-server
+        command:
+        - python
+        - -m
+        - matter_server.server
+        - --storage-path
+        - /data
+        - --port
+        - "5580"
+        - --log-level
+        - info
       volumes:
       - name: data
         persistentVolumeClaim:
@@ -131,3 +164,6 @@ spec:
       - name: configuration
         configMap:
           name: home-assistant-config
+      - name: usb-devices
+        hostPath:
+          path: /dev
