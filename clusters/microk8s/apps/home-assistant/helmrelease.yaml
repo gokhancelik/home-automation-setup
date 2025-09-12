@@ -123,6 +123,8 @@ spec:
 
         # Zigbee Home Automation
         zha:
+          usb_path: /dev/ttyUSB0
+          radio_type: znp
           zigpy_config:
             ota:
               ikea_provider: true
