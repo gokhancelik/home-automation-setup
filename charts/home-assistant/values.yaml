@@ -101,8 +101,6 @@ homeAssistant:
     # Logger configuration
     logger:
       default: info
-      logs:
-        homeassistant.components.influxdb: debug
 
     # Automation
     automation: !include automations.yaml
