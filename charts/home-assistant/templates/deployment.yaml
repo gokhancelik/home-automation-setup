@@ -136,9 +136,6 @@ spec:
           readOnly: true
         - name: usb-devices
           mountPath: /dev/ttyUSB0
-        - name: tesla-wellknown
-          mountPath: /config/www/.well-known/appspecific
-          readOnly: true
         resources:
           requests:
             cpu: 200m
@@ -180,6 +177,4 @@ spec:
         hostPath:
           path: /dev/ttyUSB0
           type: CharDevice
-      - name: tesla-wellknown
-        configMap:
-          name: tesla-wellknown-config
+
