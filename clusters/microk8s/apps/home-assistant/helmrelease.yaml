@@ -12,7 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.0.0
+      version: 1.0.6
       interval: 1m
   values:
     image:
@@ -55,13 +55,38 @@ spec:
         frontend:
           themes: !include_dir_merge_named themes
 
-        # Matter (Thread/Matter) integration for smart home interoperability
-        # Matter Server runs as a sidecar container
-        matter:
-          url: ws://localhost:5580/ws
-          
-        # Thread integration for Matter over Thread
-        thread:
+        # ZHA (Zigbee Home Automation) for Aqara and other Zigbee devices
+        # Requires a Zigbee coordinator (USB dongle) connected to the system
+        zha:
+          # Configuration will be done through the UI after adding the integration
+          # Supported coordinators: ConBee II, Sonoff ZBDongle-P, SkyConnect, etc.
+
+        # HomeKit Bridge - Expose Home Assistant devices to Apple HomeKit
+        # This allows Zigbee devices (like Aqara FP2) to work with HomeKit
+        homekit:
+          - name: "Home Assistant Bridge"
+            port: 21063
+            filter:
+              include_domains:
+                - light
+                - switch
+                - sensor
+                - binary_sensor
+                - climate
+                - cover
+                - fan
+                - lock
+                - media_player
+              exclude_entities:
+                # Exclude noisy sensors that shouldn't be in HomeKit
+                - sensor.uptime
+                - sensor.date
+                - sensor.time
+            entity_config:
+              # Configure specific devices for HomeKit if needed
+              binary_sensor.aqara_fp2_presence:
+                name: "Room Presence"
+                type: "motion"
 
         # InfluxDB v2 integration for time-series data
         influxdb:
