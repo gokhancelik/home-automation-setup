@@ -121,19 +121,6 @@ spec:
               - "automation.*"
               - "script.*"
 
-        # Zigbee Home Automation
-        zha:
-          usb_path: /dev/ttyUSB0
-          radio_type: znp
-          zigpy_config:
-            ota:
-              ikea_provider: true
-              ledvance_provider: true
-              salus_provider: true
-              sonoff_provider: true
-              thirdreality_provider: true
-          database_path: /config/zigbee.db
-
         # Logger configuration
         logger:
           default: info
