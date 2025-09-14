@@ -12,7 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.0.7
+      version: 1.0.12
       interval: 1m
   values:
     image:
@@ -124,6 +124,11 @@ spec:
         # Logger configuration
         logger:
           default: info
+
+        # MQTT configuration (for future use with Aqara FP2 if needed)
+        mqtt:
+          discovery: true
+          discovery_prefix: homeassistant
 
         # Automation
         automation: !include automations.yaml
