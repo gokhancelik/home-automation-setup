@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/name: home-assistant
         app.kubernetes.io/instance: home-assistant
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
       - name: install-hacs
         image: alpine:3.18
