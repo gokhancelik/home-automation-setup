@@ -140,6 +140,11 @@ spec:
           readOnly: true
         - name: usb-devices
           mountPath: /dev/ttyUSB0
+        - name: bluetooth-socket
+          mountPath: /var/run/dbus
+        - name: bluetooth-sys
+          mountPath: /sys/class/bluetooth
+          readOnly: true
         resources:
           {{- if .Values.resources }}
           {{- toYaml .Values.resources | nindent 10 }}
@@ -178,4 +183,12 @@ spec:
         hostPath:
           path: /dev/ttyUSB0
           type: CharDevice
+      - name: bluetooth-socket
+        hostPath:
+          path: /var/run/dbus
+          type: Directory
+      - name: bluetooth-sys
+        hostPath:
+          path: /sys/class/bluetooth
+          type: Directory
 

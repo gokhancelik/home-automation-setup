@@ -95,6 +95,9 @@ homeAssistant:
             - sensor.date
             - sensor.time
 
+    # Bluetooth integration for device tracking and discovery
+    bluetooth:
+
     # Recorder (local database)
     recorder:
       purge_keep_days: 1
