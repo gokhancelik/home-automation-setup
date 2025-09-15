@@ -5,8 +5,8 @@ image:
 
 # Networking configuration
 networking:
-  hostNetwork: false
-  dnsPolicy: ClusterFirst
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
 
 # Security context
 securityContext: {}
