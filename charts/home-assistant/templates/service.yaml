@@ -11,10 +11,6 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: 21063
-      targetPort: homekit
-      protocol: TCP
-      name: homekit
     - port: 5580
       targetPort: matter-ws
       protocol: TCP

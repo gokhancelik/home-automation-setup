@@ -74,26 +74,6 @@ homeAssistant:
           - climate
           - weather
 
-    # HomeKit Bridge - Expose Home Assistant devices to Apple HomeKit
-    homekit:
-      - name: "Home Assistant Bridge"
-        port: 21063
-        filter:
-          include_domains:
-            - light
-            - switch
-            - sensor
-            - binary_sensor
-            - climate
-            - cover
-            - fan
-            - lock
-            - media_player
-          exclude_entities:
-            # Exclude noisy sensors that shouldn't be in HomeKit
-            - sensor.uptime
-            - sensor.date
-            - sensor.time
 
     # Bluetooth integration for device tracking and discovery
     bluetooth:
