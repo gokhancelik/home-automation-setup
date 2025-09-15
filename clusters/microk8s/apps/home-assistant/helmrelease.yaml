@@ -125,11 +125,6 @@ spec:
         logger:
           default: info
 
-        # MQTT configuration (for future use with Aqara FP2 if needed)
-        mqtt:
-          discovery: true
-          discovery_prefix: homeassistant
-
         # Automation
         automation: !include automations.yaml
 
