@@ -20,8 +20,10 @@ spec:
         app.kubernetes.io/name: home-assistant
         app.kubernetes.io/instance: home-assistant
     spec:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      {{- if .Values.networking.hostNetwork }}
+      hostNetwork: {{ .Values.networking.hostNetwork }}
+      dnsPolicy: {{ .Values.networking.dnsPolicy | default "ClusterFirstWithHostNet" }}
+      {{- end }}
       initContainers:
       - name: install-hacs
         image: alpine:3.18
@@ -88,35 +90,35 @@ spec:
         - name: LATITUDE
           valueFrom:
             secretKeyRef:
-              name: home-assistant-config
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: latitude
         - name: LONGITUDE
           valueFrom:
             secretKeyRef:
-              name: home-assistant-config
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: longitude
         - name: TIMEZONE
           valueFrom:
             secretKeyRef:
-              name: home-assistant-config
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: timezone
         - name: API_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: home-assistant-config
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: api-password
         - name: INFLUXDB_TOKEN
           valueFrom:
             secretKeyRef:
-              name: home-assistant-config
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: influxdb-token
         volumeMounts:
         - name: data
           mountPath: /config
       containers:
       - name: home-assistant
-        image: "homeassistant/home-assistant:2025.8.3"
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
         ports:
         - containerPort: 8123
           name: http
@@ -139,12 +141,9 @@ spec:
         - name: usb-devices
           mountPath: /dev/ttyUSB0
         resources:
-          requests:
-            cpu: 200m
-            memory: 512Mi
-          limits:
-            cpu: 1000m
-            memory: 2Gi
+          {{- if .Values.resources }}
+          {{- toYaml .Values.resources | nindent 10 }}
+          {{- end }}
       - name: matter-server
         image: ghcr.io/home-assistant-libs/python-matter-server:stable
         ports:
@@ -174,7 +173,7 @@ spec:
           claimName: home-assistant-data
       - name: configuration
         configMap:
-          name: home-assistant-config
+          name: {{ .Values.secretRef.name | default "home-assistant-config" }}
       - name: usb-devices
         hostPath:
           path: /dev/ttyUSB0
