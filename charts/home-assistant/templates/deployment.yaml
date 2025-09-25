@@ -172,6 +172,8 @@ spec:
         - "5580"
         - --log-level
         - info
+      securityContext:
+        fsGroup: 1000
       volumes:
       - name: data
         persistentVolumeClaim:
