@@ -8,8 +8,9 @@ networking:
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
 
-# Security context
-securityContext: {}
+# Security context - only fsGroup to allow init containers to write files
+securityContext:
+  fsGroup: 1000
 
 homeAssistant:
   configuration: |
