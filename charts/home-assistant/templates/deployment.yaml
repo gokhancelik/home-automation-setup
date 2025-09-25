@@ -145,6 +145,9 @@ spec:
         - name: bluetooth-sys
           mountPath: /sys/class/bluetooth
           readOnly: true
+        - name: tesla-public-key
+          mountPath: /config/www/.well-known/appspecific
+          readOnly: true
         resources:
           {{- if .Values.resources }}
           {{- toYaml .Values.resources | nindent 10 }}
@@ -195,4 +198,7 @@ spec:
         hostPath:
           path: /sys/class/bluetooth
           type: Directory
+      - name: tesla-public-key
+        secret:
+          secretName: tesla-public-key-secret
 
