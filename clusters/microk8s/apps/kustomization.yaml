@@ -5,5 +5,4 @@ resources:
   - home-assistant/
   - matter-server/
   - zigbee/
-  - zigbee/
   - test-web/
