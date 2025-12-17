@@ -23,11 +23,8 @@ spec:
       retries: 3
   values:
     # PostgreSQL configuration
-    image:
-      repository: bitnami/postgresql
-      tag: "16.4.0"
-      pullPolicy: IfNotPresent
-
+    # Using chart's default PostgreSQL version for stability
+    
     # Authentication
     auth:
       enablePostgresUser: true
