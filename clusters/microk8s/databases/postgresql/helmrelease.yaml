@@ -25,7 +25,7 @@ spec:
     # PostgreSQL configuration
     image:
       repository: bitnami/postgresql
-      tag: "17"  # Use latest PostgreSQL 17.x for better availability
+      digest: sha256:2faab3906ce920e5237c38b3a85db4c8dbfb3571f42eb4f935737872d803c5d0
       pullPolicy: IfNotPresent
     
     # Authentication
