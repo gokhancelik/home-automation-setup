@@ -40,9 +40,13 @@ spec:
     # Persistence configuration
     persistence:
       enabled: true
-      storageClass: "ssd-storage"
+      storageClass: "nfs-storage"
       size: 20Gi
       accessMode: ReadWriteOnce
+
+    # Node selector to run on pi-lab (where NFS is mounted)
+    nodeSelector:
+      kubernetes.io/hostname: pi-lab
 
     # Service configuration
     service:
