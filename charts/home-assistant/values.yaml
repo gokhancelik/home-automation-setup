@@ -129,7 +129,7 @@ ingress:
 persistence:
   enabled: true
   size: 5Gi
-  storageClass: ssd-storage
+  storageClass: nfs-storage
 
 resources:
   requests:
