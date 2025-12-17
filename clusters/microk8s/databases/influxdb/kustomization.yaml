@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - sealed-secret.yaml
   - helmrelease.yaml
+  - pvc.yaml
