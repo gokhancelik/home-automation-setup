@@ -40,7 +40,7 @@ data:
     max_keepalive 65535
     
     # Message size limits
-    message_size_limit 268435456
+    max_packet_size 268435456
     
     # Websocket support (optional, for web clients)
     listener 9001
