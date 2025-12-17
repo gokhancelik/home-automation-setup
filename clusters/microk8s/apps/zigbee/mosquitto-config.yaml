@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  namespace: zigbee
+data:
+  mosquitto.conf: |
+    # Mosquitto MQTT Broker Configuration
+    # Persistence for message retention
+    persistence true
+    persistence_location /mosquitto/data/
+    
+    # Logging
+    log_dest stdout
+    log_type error
+    log_type warning
+    log_type notice
+    log_type information
+    log_timestamp true
+    
+    # Default listener on port 1883 (internal)
+    listener 1883
+    protocol mqtt
+    
+    # Authentication (using password file)
+    allow_anonymous false
+    password_file /mosquitto/config/password_file
+    
+    # ACL (access control list)
+    acl_file /mosquitto/config/acl_file
+    
+    # Connection messages
+    connection_messages true
+    
+    # Quality of Service
+    max_queued_messages 1000
+    max_inflight_messages 20
+    
+    # Keep alive
+    max_keepalive 65535
+    
+    # Message size limits
+    message_size_limit 268435456
+    
+    # Websocket support (optional, for web clients)
+    listener 9001
+    protocol websockets
+  
+  acl_file: |
+    # ACL (Access Control List)
+    # Pattern for Zigbee2MQTT topics
+    
+    # Zigbee2MQTT user
+    user zigbee2mqtt
+    topic readwrite zigbee2mqtt/#
+    topic read homeassistant/#
+    
+    # Home Assistant user
+    user homeassistant
+    topic readwrite #
+  
+  password_file: |
+    # Placeholder - will be replaced by init container
+    # Format: username:hashed_password

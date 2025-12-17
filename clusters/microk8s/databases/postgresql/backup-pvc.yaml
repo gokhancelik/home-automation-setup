@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-backup-pvc
+  namespace: data-storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 5Gi

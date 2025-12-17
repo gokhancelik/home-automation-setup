@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zigbee2mqtt-config
+  namespace: zigbee
+data:
+  configuration.yaml: |
+    # Zigbee2MQTT Configuration
+    # https://www.zigbee2mqtt.io/guide/configuration/
+    
+    # Home Assistant integration
+    homeassistant: true
+    
+    # MQTT settings
+    mqtt:
+      base_topic: zigbee2mqtt
+      server: mqtt://mosquitto.zigbee.svc.cluster.local:1883
+      user: zigbee2mqtt
+      password: '!secret mqtt_password'
+      # Keep alive
+      keepalive: 60
+      # TLS/SSL (disabled for internal communication)
+      reject_unauthorized: false
+      
+    # Serial (USB Zigbee coordinator)
+    serial:
+      port: /dev/ttyUSB0
+      adapter: auto
+      disable_led: false
+    
+    # Advanced settings
+    advanced:
+      # Network key (should be overridden in secret)
+      network_key: GENERATE
+      # Pan ID
+      pan_id: GENERATE
+      # Channel (11-26, default 11)
+      channel: 11
+      # Logging
+      log_level: info
+      log_output:
+        - console
+      # Cache state
+      cache_state: true
+      cache_state_persistent: true
+      cache_state_send_on_startup: true
+      # Legacy API (enable for compatibility)
+      legacy_api: false
+      legacy_availability_payload: false
+      # Device availability
+      availability_timeout: 300
+      availability_blocklist: []
+      availability_passlist: []
+    
+    # Frontend settings
+    frontend:
+      port: 8080
+      host: 0.0.0.0
+      # Authentication
+      auth_token: '!secret frontend_auth_token'
+    
+    # Device options
+    device_options:
+      retain: true
+    
+    # Permit join (default disabled for security)
+    permit_join: false
+    
+    # External converters (for unsupported devices)
+    external_converters: []
+    
+    # Devices (will be auto-populated)
+    devices: devices.yaml
+    
+    # Groups (will be auto-populated)
+    groups: groups.yaml
+  
+  devices.yaml: |
+    # Zigbee devices will be auto-populated here
+    # Format:
+    # '0x00158d0001234567':
+    #   friendly_name: 'device_name'
+    #   retain: true
+  
+  groups.yaml: |
+    # Zigbee groups will be auto-populated here
+    # Format:
+    # '1':
+    #   friendly_name: 'group_name'
+    #   devices:
+    #     - device1
+    #     - device2

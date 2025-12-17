@@ -33,7 +33,9 @@ spec:
       organization: "home-automation"
       bucket: "home-assistant"
       user: "admin"
-      retention_policy: "30d"
+      # Retention: 0s = infinite (multi-year retention for energy/climate data)
+      # Data will be retained as long as storage allows
+      retention_policy: "0s"
       # Credentials from sealed secret
       existingSecret: "influxdb-admin"
 
@@ -62,6 +64,34 @@ spec:
       limits:
         cpu: 500m
         memory: 1Gi
+
+    # InfluxDB engine configuration
+    # Optimized for Raspberry Pi with long-term storage
+    env:
+      - name: INFLUXD_STORAGE_SHARD_PRECREATOR_CHECK_INTERVAL
+        value: "10m"
+      - name: INFLUXD_STORAGE_SHARD_PRECREATOR_ADVANCE_PERIOD
+        value: "30m"
+      # Shard group duration: 7 days
+      # Balances query performance with file count on NFS
+      # Longer duration = fewer files, better for Pi/NFS
+      # Shorter duration = more granular data management
+      - name: INFLUXD_STORAGE_CACHE_MAX_MEMORY_SIZE
+        value: "256m"
+      - name: INFLUXD_STORAGE_CACHE_SNAPSHOT_MEMORY_SIZE
+        value: "64m"
+      - name: INFLUXD_STORAGE_CACHE_SNAPSHOT_WRITE_COLD_DURATION
+        value: "10m"
+      - name: INFLUXD_STORAGE_COMPACT_FULL_WRITE_COLD_DURATION
+        value: "4h"
+      - name: INFLUXD_STORAGE_COMPACT_THROUGHPUT_BURST
+        value: "48m"
+      - name: INFLUXD_STORAGE_MAX_CONCURRENT_COMPACTIONS
+        value: "2"
+      - name: INFLUXD_STORAGE_MAX_INDEX_LOG_FILE_SIZE
+        value: "1m"
+      - name: INFLUXD_STORAGE_SERIES_ID_SET_CACHE_SIZE
+        value: "100"
 
     # Security context
     securityContext:

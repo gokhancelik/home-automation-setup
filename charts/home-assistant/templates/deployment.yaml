@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: home-assistant
-  namespace: home-automation
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/instance: home-assistant
@@ -77,6 +77,8 @@ spec:
           timezone: $TIMEZONE
           api_password: $API_PASSWORD
           influxdb_token: $INFLUXDB_TOKEN
+          postgresql_url: $POSTGRESQL_URL
+          mqtt_password: $MQTT_PASSWORD
           EOF
           
           # Create empty automation files if they don't exist
@@ -114,6 +116,16 @@ spec:
             secretKeyRef:
               name: {{ .Values.secretRef.name | default "home-assistant-config" }}
               key: influxdb-token
+        - name: POSTGRESQL_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
+              key: postgresql-url
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef.name | default "home-assistant-config" }}
+              key: mqtt-password
         volumeMounts:
         - name: data
           mountPath: /config
@@ -132,6 +144,9 @@ spec:
         - name: TZ
           value: "Europe/Amsterdam"
         securityContext:
+          # Privileged mode required for Bluetooth access (D-Bus and /sys/class/bluetooth)
+          # TODO: Replace with specific capabilities (CAP_NET_ADMIN, CAP_NET_RAW) if Bluetooth
+          # can be configured to work without full privileged mode
           privileged: true
         volumeMounts:
         - name: data
@@ -140,8 +155,6 @@ spec:
           mountPath: /config/configuration.yaml
           subPath: configuration.yaml
           readOnly: true
-        - name: usb-devices
-          mountPath: /dev/ttyUSB0
         - name: bluetooth-socket
           mountPath: /var/run/dbus
         - name: bluetooth-sys
@@ -154,29 +167,6 @@ spec:
           {{- if .Values.resources }}
           {{- toYaml .Values.resources | nindent 10 }}
           {{- end }}
-      - name: matter-server
-        image: ghcr.io/home-assistant-libs/python-matter-server:stable
-        ports:
-        - containerPort: 5580
-          name: matter-ws
-          protocol: TCP
-        env:
-        - name: PYTHONUNBUFFERED
-          value: "1"
-        volumeMounts:
-        - name: data
-          mountPath: /data
-          subPath: matter-server
-        command:
-        - python
-        - -m
-        - matter_server.server
-        - --storage-path
-        - /data
-        - --port
-        - "5580"
-        - --log-level
-        - info
       {{- if .Values.securityContext }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
@@ -188,10 +178,6 @@ spec:
       - name: configuration
         configMap:
           name: {{ .Values.secretRef.name | default "home-assistant-config" }}
-      - name: usb-devices
-        hostPath:
-          path: /dev/ttyUSB0
-          type: CharDevice
       - name: bluetooth-socket
         hostPath:
           path: /var/run/dbus

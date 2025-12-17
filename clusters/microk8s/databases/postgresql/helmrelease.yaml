@@ -1,0 +1,116 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: postgresql
+  namespace: data-storage
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: postgresql
+      version: 15.5.32
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      interval: 15m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # PostgreSQL configuration
+    image:
+      repository: bitnami/postgresql
+      tag: "16.4.0"
+      pullPolicy: IfNotPresent
+
+    # Authentication
+    auth:
+      enablePostgresUser: true
+      existingSecret: postgresql-credentials
+      secretKeys:
+        adminPasswordKey: postgres-password
+        userPasswordKey: password
+        replicationPasswordKey: replication-password
+      username: homeassistant
+      database: homeassistant
+
+    # Architecture
+    architecture: standalone
+
+    # Primary configuration
+    primary:
+      # Persistence
+      persistence:
+        enabled: true
+        existingClaim: postgresql-data
+        storageClass: ""
+        size: 10Gi
+
+      # Node selector to run on pi-lab (where NFS is mounted)
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
+
+      # Resources
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
+      # PostgreSQL configuration
+      extendedConfiguration: |
+        max_connections = 100
+        shared_buffers = 256MB
+        effective_cache_size = 1GB
+        maintenance_work_mem = 64MB
+        checkpoint_completion_target = 0.9
+        wal_buffers = 16MB
+        default_statistics_target = 100
+        random_page_cost = 1.1
+        effective_io_concurrency = 200
+        work_mem = 2621kB
+        min_wal_size = 1GB
+        max_wal_size = 4GB
+
+      # Security context
+      podSecurityContext:
+        enabled: true
+        fsGroup: 1001
+      containerSecurityContext:
+        enabled: true
+        runAsUser: 1001
+        runAsNonRoot: true
+
+    # Metrics (for future Prometheus integration)
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: false  # Will enable later with monitoring stack
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    # Network policy
+    networkPolicy:
+      enabled: false
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      ports:
+        postgresql: 5432
+
+    # Backup configuration (placeholder for Phase 6)
+    backup:
+      enabled: false

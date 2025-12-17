@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zigbee2mqtt
+  namespace: zigbee
+  labels:
+    app: zigbee2mqtt
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
+      initContainers:
+      - name: setup-secrets
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Create secret.yaml file with credentials
+          cat > /data/secret.yaml << EOF
+          mqtt_password: $MQTT_PASSWORD
+          frontend_auth_token: $FRONTEND_AUTH_TOKEN
+          EOF
+          
+          chmod 600 /data/secret.yaml
+        env:
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mqtt-credentials
+              key: zigbee2mqtt-password
+        - name: FRONTEND_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: zigbee2mqtt-credentials
+              key: frontend-auth-token
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      containers:
+      - name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt:1.39.1
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: TZ
+          value: "Europe/Amsterdam"
+        - name: ZIGBEE2MQTT_DATA
+          value: "/data"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /data/configuration.yaml
+          subPath: configuration.yaml
+        - name: usb-device
+          mountPath: /dev/ttyUSB0
+        securityContext:
+          # Privileged mode required for USB device access
+          privileged: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /api/bridge/info
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/bridge/info
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: zigbee2mqtt-data
+      - name: config
+        configMap:
+          name: zigbee2mqtt-config
+      - name: usb-device
+        hostPath:
+          path: /dev/ttyUSB0
+          type: CharDevice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zigbee2mqtt
+  namespace: zigbee
+  labels:
+    app: zigbee2mqtt
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: zigbee2mqtt

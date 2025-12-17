@@ -11,9 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: 5580
-      targetPort: matter-ws
-      protocol: TCP
-      name: matter-ws
   selector:
     {{- include "home-assistant.selectorLabels" . | nindent 4 }}

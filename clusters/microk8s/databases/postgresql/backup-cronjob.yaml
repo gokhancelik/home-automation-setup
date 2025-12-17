@@ -1,0 +1,88 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgresql-backup
+  namespace: data-storage
+spec:
+  # Run daily at 2 AM
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: postgresql-backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: bitnami/postgresql:16.4.0-debian-12-r13
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              BACKUP_DATE=$(date +%Y%m%d-%H%M%S)
+              BACKUP_DIR="/backups/postgresql"
+              BACKUP_FILE="${BACKUP_DIR}/homeassistant-${BACKUP_DATE}.sql.gz"
+              RETENTION_DAYS=30
+              
+              echo "=== PostgreSQL Backup Started at $(date) ==="
+              
+              # Create backup directory
+              mkdir -p "${BACKUP_DIR}"
+              
+              # Dump database
+              echo "Dumping database: homeassistant"
+              PGPASSWORD="${POSTGRES_PASSWORD}" pg_dump \
+                -h postgresql.data-storage.svc.cluster.local \
+                -U homeassistant \
+                -d homeassistant \
+                --verbose \
+                | gzip > "${BACKUP_FILE}"
+              
+              # Verify backup
+              if [ ! -s "${BACKUP_FILE}" ]; then
+                echo "ERROR: Backup file is empty"
+                exit 1
+              fi
+              
+              BACKUP_SIZE=$(du -h "${BACKUP_FILE}" | cut -f1)
+              echo "Backup completed: ${BACKUP_FILE} (${BACKUP_SIZE})"
+              
+              # Delete backups older than retention period
+              echo "Cleaning up backups older than ${RETENTION_DAYS} days"
+              find "${BACKUP_DIR}" -name "homeassistant-*.sql.gz" -type f -mtime +${RETENTION_DAYS} -delete
+              
+              # List remaining backups
+              echo "Current backups:"
+              ls -lh "${BACKUP_DIR}/"
+              
+              echo "=== Backup Completed at $(date) ==="
+            env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials
+                  key: password
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: postgresql-backup-pvc
+          nodeSelector:
+            kubernetes.io/hostname: pi-lab

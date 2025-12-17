@@ -38,11 +38,17 @@ spec:
           name: http-grafana
         env:
         - name: GF_SECURITY_ADMIN_USER
-          value: admin
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-user
         - name: GF_SECURITY_ADMIN_PASSWORD
-          value: admin
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-password
         - name: GF_INSTALL_PLUGINS
-          value: "grafana-clock-panel,grafana-simple-json-datasource"
+          value: "grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel"
         volumeMounts:
         - name: grafana-config
           mountPath: /etc/grafana

@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  namespace: zigbee
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
+      initContainers:
+      - name: setup-passwords
+        image: eclipse-mosquitto:2.0.18
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Create password file with hashed passwords from secrets
+          echo "zigbee2mqtt:$ZIGBEE2MQTT_PASSWORD" > /tmp/passwords.txt
+          echo "homeassistant:$HOMEASSISTANT_PASSWORD" >> /tmp/passwords.txt
+          
+          # Hash passwords using mosquitto_passwd
+          touch /mosquitto/config/password_file
+          mosquitto_passwd -U /tmp/passwords.txt
+          cp /tmp/passwords.txt /mosquitto/config/password_file
+          
+          # Set permissions
+          chmod 644 /mosquitto/config/password_file
+          chown 1883:1883 /mosquitto/config/password_file
+        env:
+        - name: ZIGBEE2MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mqtt-credentials
+              key: zigbee2mqtt-password
+        - name: HOMEASSISTANT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mqtt-credentials
+              key: homeassistant-password
+        volumeMounts:
+        - name: config
+          mountPath: /mosquitto/config
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:2.0.18
+        ports:
+        - containerPort: 1883
+          name: mqtt
+          protocol: TCP
+        - containerPort: 9001
+          name: websocket
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /mosquitto/config
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/acl_file
+          subPath: acl_file
+        - name: data
+          mountPath: /mosquitto/data
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        livenessProbe:
+          tcpSocket:
+            port: 1883
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: 1883
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+      volumes:
+      - name: config
+        emptyDir: {}
+      - name: mosquitto-config
+        configMap:
+          name: mosquitto-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: mosquitto-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+  namespace: zigbee
+  labels:
+    app: mosquitto
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1883
+    targetPort: mqtt
+    protocol: TCP
+    name: mqtt
+  - port: 9001
+    targetPort: websocket
+    protocol: TCP
+    name: websocket
+  selector:
+    app: mosquitto

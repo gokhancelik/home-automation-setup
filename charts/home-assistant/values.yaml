@@ -47,7 +47,31 @@ homeAssistant:
     frontend:
       themes: !include_dir_merge_named themes
 
-    # InfluxDB v2 integration for time-series data
+    # MQTT integration for Zigbee2MQTT
+    # Mosquitto broker runs in zigbee namespace
+    # Authentication disabled for internal cluster communication
+    mqtt:
+      broker: mosquitto.zigbee.svc.cluster.local
+      port: 1883
+      discovery: true
+      discovery_prefix: homeassistant
+      birth_message:
+        topic: 'homeassistant/status'
+        payload: 'online'
+      will_message:
+        topic: 'homeassistant/status'
+        payload: 'offline'
+      discovery: true
+      discovery_prefix: homeassistant
+      birth_message:
+        topic: 'homeassistant/status'
+        payload: 'online'
+      will_message:
+        topic: 'homeassistant/status'
+        payload: 'offline'
+
+    # InfluxDB v2 integration for long-term time-series data
+    # Retention: Infinite (multi-year) - suitable for energy/climate analysis
     influxdb:
       api_version: 2
       host: influxdb-influxdb2.data-storage.svc.cluster.local
@@ -59,12 +83,24 @@ homeAssistant:
       bucket: home-assistant
       max_retries: 3
       default_measurement: state
+      # Tags for better querying and organization
+      tags:
+        source: home-assistant
+        location: home
+      tags_attributes:
+        - friendly_name
+        - device_class
+      # Exclude non-useful data from long-term storage
       exclude:
         entities:
           - zone.home
+          - sun.sun
         domains:
           - automation
           - updater
+          - script
+          - group
+      # Include valuable long-term metrics
       include:
         domains:
           - sensor
@@ -74,12 +110,19 @@ homeAssistant:
           - device_tracker
           - climate
           - weather
+        entity_globs:
+          - sensor.*_energy
+          - sensor.*_power
+          - sensor.*_temperature
+          - sensor.*_humidity
+          - sensor.*_battery
+          - sensor.*_voltage
 
-    # Recorder (local database)
+    # Recorder (PostgreSQL database)
     recorder:
-      purge_keep_days: 10
+      purge_keep_days: 30
       commit_interval: 1
-      db_url: "sqlite:////config/home-assistant_v2.db"
+      db_url: !secret postgresql_url
       exclude:
         domains:
           - automation
@@ -111,6 +154,13 @@ homeAssistant:
 
     # Scenes
     scene: !include scenes.yaml
+
+    # Matter integration (experimental)
+    # Matter server runs in separate namespace for isolation
+    # Connection: ws://matter-server.matter.svc.cluster.local:5580/ws
+    # To configure Matter integration, go to:
+    # Configuration -> Integrations -> Add Integration -> Matter (BETA)
+    # Use the URL above when prompted for the Matter server address
 
 secretRef:
   name: home-assistant-config

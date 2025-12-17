@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matter-server
+  namespace: matter
+  labels:
+    app: matter-server
+    app.kubernetes.io/name: matter-server
+  annotations:
+    # Marked as experimental - can be disabled without affecting HA
+    experimental: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: matter-server
+  template:
+    metadata:
+      labels:
+        app: matter-server
+      annotations:
+        # Restart policy allows Matter to fail without affecting HA
+        experimental: "true"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
+      restartPolicy: Always
+      containers:
+      - name: matter-server
+        image: ghcr.io/home-assistant-libs/python-matter-server:6.6.0
+        ports:
+        - containerPort: 5580
+          name: websocket
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        command:
+        - python
+        - -m
+        - matter_server.server
+        - --storage-path
+        - /data
+        - --port
+        - "5580"
+        - --log-level
+        - info
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
+        livenessProbe:
+          tcpSocket:
+            port: 5580
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: 5580
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: matter-server-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matter-server
+  namespace: matter
+  labels:
+    app: matter-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5580
+    targetPort: websocket
+    protocol: TCP
+    name: websocket
+  selector:
+    app: matter-server
