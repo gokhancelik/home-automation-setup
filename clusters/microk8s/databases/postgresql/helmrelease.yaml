@@ -23,7 +23,10 @@ spec:
       retries: 3
   values:
     # PostgreSQL configuration
-    # Using chart's default PostgreSQL version for stability
+    image:
+      repository: bitnami/postgresql
+      tag: "17"  # Use latest PostgreSQL 17.x for better availability
+      pullPolicy: IfNotPresent
     
     # Authentication
     auth:
