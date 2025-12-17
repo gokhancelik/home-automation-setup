@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/name: home-assistant
         app.kubernetes.io/instance: home-assistant
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
       {{- if .Values.networking.hostNetwork }}
       hostNetwork: {{ .Values.networking.hostNetwork }}
       dnsPolicy: {{ .Values.networking.dnsPolicy | default "ClusterFirstWithHostNet" }}
