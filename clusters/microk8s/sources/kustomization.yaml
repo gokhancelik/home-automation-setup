@@ -9,3 +9,4 @@ resources:
   - fluent.yaml
   - grafana.yaml
   - influxdata.yaml
+  - nfs-provisioner.yaml
