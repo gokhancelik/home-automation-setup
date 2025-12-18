@@ -88,18 +88,9 @@ spec:
         runAsUser: 1001
         runAsNonRoot: true
 
-    # Metrics (for future Prometheus integration)
+    # Metrics (disabled due to image availability issues)
     metrics:
-      enabled: true
-      serviceMonitor:
-        enabled: false  # Will enable later with monitoring stack
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          cpu: 100m
-          memory: 128Mi
+      enabled: false
 
     # Network policy
     networkPolicy:
