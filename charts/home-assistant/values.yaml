@@ -47,15 +47,8 @@ homeAssistant:
     frontend:
       themes: !include_dir_merge_named themes
 
-    # MQTT integration for Zigbee2MQTT
-    # Mosquitto broker runs in zigbee namespace
-    mqtt:
-      broker: mosquitto.zigbee.svc.cluster.local
-      port: 1883
-      username: homeassistant
-      password: !secret mqtt_password
-      discovery: true
-      discovery_prefix: homeassistant
+    # MQTT integration is configured via UI (Settings → Devices & Services)
+    # Broker: localhost:1883 (Mosquitto with hostNetwork)
 
     # InfluxDB v2 integration for long-term time-series data
     # Retention: Infinite (multi-year) - suitable for energy/climate analysis
