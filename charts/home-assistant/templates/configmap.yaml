@@ -6,7 +6,7 @@ metadata:
     {{- include "home-assistant.labels" . | nindent 4 }}
 data:
   configuration.yaml: |
-{{ .Values.homeAssistant.configuration | indent 4 }}
+    {{- .Values.homeAssistant.configuration | nindent 4 }}
   automations.yaml: |
     # Automations will be configured here
     []
