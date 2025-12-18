@@ -112,15 +112,17 @@ metadata:
   labels:
     app: mosquitto
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - port: 1883
     targetPort: mqtt
     protocol: TCP
     name: mqtt
+    nodePort: 31883
   - port: 9001
     targetPort: websocket
     protocol: TCP
     name: websocket
+    nodePort: 31901
   selector:
     app: mosquitto
