@@ -82,16 +82,14 @@ spec:
             cpu: 500m
             memory: 512Mi
         livenessProbe:
-          httpGet:
-            path: /api/bridge/info
+          tcpSocket:
             port: 8080
           initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
         readinessProbe:
-          httpGet:
-            path: /api/bridge/info
+          tcpSocket:
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
