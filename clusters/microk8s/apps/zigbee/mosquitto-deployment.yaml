@@ -17,6 +17,8 @@ spec:
       labels:
         app: mosquitto
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         kubernetes.io/hostname: pi-lab
       initContainers:
