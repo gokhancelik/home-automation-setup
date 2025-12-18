@@ -272,9 +272,9 @@ This repository includes a Home Assistant deployment with full Matter support fo
 
 ### Features
 
-- **Home Assistant 2025.8.0b2** with Matter integration
-- **Separate Matter server** (python-matter-server 8.0.0) running as dedicated service
-- **Chart version 0.4.3** with Matter support and deployment strategy optimizations
+- **Home Assistant 2025.12.3** with Matter integration
+- **Separate Matter server** (python-matter-server 6.6.0) running as dedicated service
+- **Chart version 1.1.9** with Matter support and deployment strategy optimizations
 - **Host networking** enabled for proper Matter multicast communication
 - **Matter server on port 5580** for WebSocket communication
 - **Privileged security context** for network interface access
@@ -285,7 +285,7 @@ This repository includes a Home Assistant deployment with full Matter support fo
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ Kubernetes Node (192.168.68.83)                │
+│ Kubernetes Node (192.168.2.109)                │
 │                                                 │
 │ ┌─────────────────────────────────────────────┐ │
 │ │ Home Assistant Pod                          │ │
@@ -320,7 +320,7 @@ For detailed information about the Matter setup, see: [`MATTER_SETUP.md`](MATTER
 ### Quick Start
 
 1. Ensure your Flux setup is running (see above)
-2. Access Home Assistant at `https://ha.gcelik.dev` or `http://192.168.68.83:8123`
-3. Go to Settings → Devices & Services → Integrations
-4. Add Matter integration with URL: `ws://192.168.68.83:5580/ws`
+3. Access Home Assistant at `https://ha.gcelik.dev` or `http://192.168.2.109:8123`
+4. Go to Settings → Devices & Services → Integrations
+5. Add Matter integration with URL: `ws://192.168.2.109:5580/ws`
 5. Commission your Matter devices through the integration
