@@ -26,6 +26,11 @@ spec:
         - /bin/sh
         - -c
         - |
+          # Copy configuration template to writable location if not exists
+          if [ ! -f /data/configuration.yaml ]; then
+            cp /config-template/configuration.yaml /data/configuration.yaml
+          fi
+          
           # Create secret.yaml file with credentials
           cat > /data/secret.yaml << EOF
           mqtt_password: $MQTT_PASSWORD
@@ -47,6 +52,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+        - name: config
+          mountPath: /config-template
       containers:
       - name: zigbee2mqtt
         image: koenkk/zigbee2mqtt:1.39.1
@@ -62,9 +69,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-        - name: config
-          mountPath: /data/configuration.yaml
-          subPath: configuration.yaml
         - name: usb-device
           mountPath: /dev/ttyUSB0
         securityContext:
