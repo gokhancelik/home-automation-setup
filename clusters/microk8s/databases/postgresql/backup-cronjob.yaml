@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: backup
-            image: bitnami/postgresql:16.4.0-debian-12-r13
+            image: docker.io/bitnami/postgresql@sha256:2faab3906ce920e5237c38b3a85db4c8dbfb3571f42eb4f935737872d803c5d0
             command:
             - /bin/bash
             - -c
