@@ -21,6 +21,8 @@ data:
       keepalive: 60
       # TLS/SSL (disabled for internal communication)
       reject_unauthorized: false
+      # Retain discovery messages for Home Assistant
+      retain: true
       
     # Serial (USB Zigbee coordinator)
     serial:
