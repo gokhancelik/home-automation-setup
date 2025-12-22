@@ -53,7 +53,7 @@ data:
     # Zigbee2MQTT user
     user zigbee2mqtt
     topic readwrite zigbee2mqtt/#
-    topic read homeassistant/#
+    topic readwrite homeassistant/#
     
     # Home Assistant user
     user homeassistant
