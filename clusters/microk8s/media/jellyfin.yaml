@@ -1,0 +1,153 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jellyfin-config
+  namespace: media
+data:
+  # Jellyfin configuration notes for Direct Play / Passthrough
+  # These settings must be configured via the web UI after deployment
+  DIRECT_PLAY_SETTINGS: |
+    Settings > Playback:
+    - Allow video playback that requires conversion without re-encoding: ENABLED
+    - Allow audio playback that requires conversion: DISABLED (forces direct play)
+    - Maximum allowed video transcoding resolution: 4K - HEVC 60fps
+    
+    Settings > Transcoding:
+    - Hardware acceleration: None (avoid transcoding entirely)
+    - Enable VPP Tone mapping: DISABLED
+    - Prefer fMP4-HLS Media Container: DISABLED
+    - Allow subtitle extraction on the fly: ENABLED (doesn't affect audio)
+    
+    Client Settings (per device):
+    - Video codec: Direct Play preferred
+    - Audio codec: Direct Play only
+    - Bitrate limit: Maximum
+    
+  AUDIO_CODEC_PRIORITY: |
+    Ensure these codecs are passed through without transcoding:
+    - TrueHD (Dolby Atmos)
+    - DTS-HD MA
+    - DTS:X
+    - E-AC3 (DD+ Atmos)
+    - AC3 (DD 5.1)
+    
+    Network requirement: Minimum 100 Mbps for 4K REMUX Direct Play
+    Client requirement: Hardware capable of decoding HEVC 10-bit and lossless audio
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: media
+  labels:
+    app: jellyfin
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      containers:
+      - name: jellyfin
+        image: lscr.io/linuxserver/jellyfin:10.8.13
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "UTC"
+        - name: JELLYFIN_PublishedServerUrl
+          value: "https://jellyfin.yourdomain.com"  # Update with your domain
+        ports:
+        - name: http
+          containerPort: 8096
+          protocol: TCP
+        - name: https
+          containerPort: 8920
+          protocol: TCP
+        - name: dlna-udp
+          containerPort: 1900
+          protocol: UDP
+        - name: discovery
+          containerPort: 7359
+          protocol: UDP
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: jellyfin
+        - name: cache
+          mountPath: /cache
+          subPath: jellyfin-cache
+        - name: movies
+          mountPath: /media/movies
+          readOnly: true  # Jellyfin should never write to media
+        - name: tv
+          mountPath: /media/tv
+          readOnly: true
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 4000m  # Higher for potential transcoding fallback
+            memory: 4Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8096
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8096
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: media-config
+      - name: cache
+        persistentVolumeClaim:
+          claimName: media-config
+      - name: movies
+        persistentVolumeClaim:
+          claimName: media-content
+      - name: tv
+        persistentVolumeClaim:
+          claimName: media-content
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+  namespace: media
+  labels:
+    app: jellyfin
+spec:
+  type: ClusterIP
+  selector:
+    app: jellyfin
+  ports:
+  - name: http
+    port: 8096
+    targetPort: 8096
+    protocol: TCP
+  - name: https
+    port: 8920
+    targetPort: 8920
+    protocol: TCP

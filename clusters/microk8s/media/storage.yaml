@@ -1,0 +1,145 @@
+---
+# PersistentVolume for media content (movies, series)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-content
+  labels:
+    type: nfs
+    usage: media-content
+spec:
+  capacity:
+    storage: 700Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-media
+  nfs:
+    server: 192.168.2.24  # Update with your NAS IP
+    path: /volume1/media   # Update with your NFS export path
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - timeo=600
+    - retrans=2
+    - rsize=1048576
+    - wsize=1048576
+
+---
+# PersistentVolumeClaim for media content
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-content
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-media
+  resources:
+    requests:
+      storage: 700Gi
+  selector:
+    matchLabels:
+      type: nfs
+      usage: media-content
+
+---
+# PersistentVolume for downloads (qBittorrent working directory)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-downloads
+  labels:
+    type: nfs
+    usage: media-downloads
+spec:
+  capacity:
+    storage: 250Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-media
+  nfs:
+    server: 192.168.2.200  # Update with your NAS IP
+    path: /volume1/downloads  # Update with your NFS export path
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - timeo=600
+    - retrans=2
+    - rsize=1048576
+    - wsize=1048576
+
+---
+# PersistentVolumeClaim for downloads
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-downloads
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-media
+  resources:
+    requests:
+      storage: 250Gi
+  selector:
+    matchLabels:
+      type: nfs
+      usage: media-downloads
+
+---
+# PersistentVolume for application configs
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-config
+  labels:
+    type: nfs
+    usage: media-config
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-media
+  nfs:
+    server: 192.168.2.200  # Update with your NAS IP
+    path: /volume1/k8s-media-config  # Update with your NFS export path
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - timeo=600
+    - retrans=2
+
+---
+# PersistentVolumeClaim for application configs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-media
+  resources:
+    requests:
+      storage: 50Gi
+  selector:
+    matchLabels:
+      type: nfs
+      usage: media-config
+
+---
+# StorageClass for NFS-based media storage
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-media
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain

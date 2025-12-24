@@ -1,0 +1,24 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: media
+
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - qbittorrent.yaml
+  - radarr.yaml
+  - sonarr.yaml
+  - jellyfin.yaml
+
+# Generate ConfigMaps for API credentials (must be created after initial setup)
+# kubectl create secret generic media-api-keys -n media \
+#   --from-literal=radarr-api-key=YOUR_RADARR_API_KEY \
+#   --from-literal=sonarr-api-key=YOUR_SONARR_API_KEY \
+#   --from-literal=jellyfin-api-key=YOUR_JELLYFIN_API_KEY \
+#   --from-literal=qbittorrent-password=YOUR_QB_PASSWORD
+
+commonLabels:
+  app.kubernetes.io/part-of: media-pipeline
+  managed-by: kustomize

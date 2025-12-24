@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrent-config
+  namespace: media
+data:
+  # qBittorrent will auto-generate most of its config
+  # This ConfigMap is for documentation and potential overrides
+  VPN_REQUIRED: "true"  # Assumption: VPN is handled externally (sidecar or host-level)
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qbittorrent
+  namespace: media
+  labels:
+    app: qbittorrent
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Avoid multiple instances writing to same config
+  selector:
+    matchLabels:
+      app: qbittorrent
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      containers:
+      - name: qbittorrent
+        image: lscr.io/linuxserver/qbittorrent:4.6.2
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "UTC"
+        - name: WEBUI_PORT
+          value: "8080"
+        ports:
+        - name: webui
+          containerPort: 8080
+          protocol: TCP
+        - name: bt-tcp
+          containerPort: 6881
+          protocol: TCP
+        - name: bt-udp
+          containerPort: 6881
+          protocol: UDP
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: qbittorrent
+        - name: downloads
+          mountPath: /downloads
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: media-config
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: media-downloads
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent
+  namespace: media
+  labels:
+    app: qbittorrent
+spec:
+  type: ClusterIP
+  selector:
+    app: qbittorrent
+  ports:
+  - name: webui
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: bt-tcp
+    port: 6881
+    targetPort: 6881
+    protocol: TCP
+  - name: bt-udp
+    port: 6881
+    targetPort: 6881
+    protocol: UDP

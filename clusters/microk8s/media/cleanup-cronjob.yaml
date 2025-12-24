@@ -1,0 +1,214 @@
+---
+# ConfigMap for cleanup job configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: media-cleanup-config
+  namespace: media
+data:
+  GRACE_PERIOD_DAYS: "3"
+  DRY_RUN: "true"  # Change to "false" to enable actual deletion
+  KEEP_TAG_LABEL: "keep"
+  PRIMARY_USER_NAME: "admin"
+  
+  # Service URLs
+  JELLYFIN_URL: "http://jellyfin.media.svc.cluster.local:8096"
+  RADARR_URL: "http://radarr.media.svc.cluster.local:7878"
+  SONARR_URL: "http://sonarr.media.svc.cluster.local:8989"
+  
+  # Path prefixes
+  JELLYFIN_MOVIE_PREFIX: "/media/movies/"
+  JELLYFIN_TV_PREFIX: "/media/tv/"
+  RADARR_PREFIX: "/movies/"
+  SONARR_PREFIX: "/tv/"
+
+---
+# ServiceAccount for cleanup job
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: media-cleanup
+  namespace: media
+
+---
+# Role for cleanup job (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: media-cleanup
+  namespace: media
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding for cleanup job
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: media-cleanup
+  namespace: media
+subjects:
+- kind: ServiceAccount
+  name: media-cleanup
+  namespace: media
+roleRef:
+  kind: Role
+  name: media-cleanup
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# CronJob for automated cleanup (runs daily at 3 AM)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: media-cleanup
+  namespace: media
+  labels:
+    app: media-cleanup
+spec:
+  schedule: "0 3 * * *"  # Daily at 3:00 AM
+  concurrencyPolicy: Forbid  # Don't run concurrent jobs
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      labels:
+        app: media-cleanup
+    spec:
+      backoffLimit: 2  # Retry failed jobs twice
+      activeDeadlineSeconds: 3600  # Timeout after 1 hour
+      template:
+        metadata:
+          labels:
+            app: media-cleanup
+        spec:
+          serviceAccountName: media-cleanup
+          restartPolicy: OnFailure
+          containers:
+          - name: cleanup
+            image: python:3.11-slim
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Install dependencies
+              pip install --no-cache-dir requests
+
+              # Run cleanup script
+              cd /app
+              python cleanup.py
+            env:
+            - name: GRACE_PERIOD_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: GRACE_PERIOD_DAYS
+            - name: DRY_RUN
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: DRY_RUN
+            - name: KEEP_TAG_LABEL
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: KEEP_TAG_LABEL
+            - name: PRIMARY_USER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: PRIMARY_USER_NAME
+            - name: JELLYFIN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: JELLYFIN_URL
+            - name: RADARR_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: RADARR_URL
+            - name: SONARR_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: SONARR_URL
+            - name: JELLYFIN_MOVIE_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: JELLYFIN_MOVIE_PREFIX
+            - name: JELLYFIN_TV_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: JELLYFIN_TV_PREFIX
+            - name: RADARR_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: RADARR_PREFIX
+            - name: SONARR_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: media-cleanup-config
+                  key: SONARR_PREFIX
+            - name: JELLYFIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: media-api-keys
+                  key: jellyfin-api-key
+            - name: RADARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: media-api-keys
+                  key: radarr-api-key
+            - name: SONARR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: media-api-keys
+                  key: sonarr-api-key
+            volumeMounts:
+            - name: scripts
+              mountPath: /app
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          volumes:
+          - name: scripts
+            configMap:
+              name: media-cleanup-scripts
+              defaultMode: 0755
+
+---
+# ConfigMap containing cleanup scripts
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: media-cleanup-scripts
+  namespace: media
+data:
+  cleanup.py: |
+    # This will be populated from media-pipeline/scripts/cleanup.py
+    # To update:
+    # kubectl create configmap media-cleanup-scripts -n media \
+    #   --from-file=cleanup.py=media-pipeline/scripts/cleanup.py \
+    #   --from-file=media_mapper.py=media-pipeline/scripts/media_mapper.py \
+    #   --dry-run=client -o yaml | kubectl apply -f -
+    
+    import sys
+    print("ERROR: Cleanup scripts not populated in ConfigMap")
+    print("Run: kubectl create configmap media-cleanup-scripts -n media \\")
+    print("       --from-file=cleanup.py=media-pipeline/scripts/cleanup.py \\")
+    print("       --from-file=media_mapper.py=media-pipeline/scripts/media_mapper.py \\")
+    print("       --dry-run=client -o yaml | kubectl apply -f -")
+    sys.exit(1)
