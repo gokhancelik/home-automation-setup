@@ -12,7 +12,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.2.0
+      version: 1.2.1
       interval: 1m
   values:
     # Override specific values that are environment-specific
