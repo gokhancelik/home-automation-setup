@@ -88,6 +88,8 @@ spec:
       labels:
         app: radarr
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
       containers:
       - name: radarr
         image: lscr.io/linuxserver/radarr:5.2.6
@@ -105,11 +107,13 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-          subPath: radarr
+          subPath: config/radarr
         - name: downloads
           mountPath: /downloads
+          subPath: downloads
         - name: movies
           mountPath: /movies
+          subPath: movies
         resources:
           requests:
             cpu: 200m

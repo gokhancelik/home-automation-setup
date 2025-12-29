@@ -29,6 +29,8 @@ spec:
       labels:
         app: qbittorrent
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
       containers:
       - name: qbittorrent
         image: lscr.io/linuxserver/qbittorrent:4.6.2
@@ -54,9 +56,10 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-          subPath: qbittorrent
+          subPath: config/qbittorrent
         - name: downloads
           mountPath: /downloads
+          subPath: downloads
         resources:
           requests:
             cpu: 500m

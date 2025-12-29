@@ -55,6 +55,8 @@ spec:
       labels:
         app: jellyfin
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
       containers:
       - name: jellyfin
         image: lscr.io/linuxserver/jellyfin:10.8.13
@@ -83,15 +85,17 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-          subPath: jellyfin
+          subPath: config/jellyfin
         - name: cache
           mountPath: /cache
-          subPath: jellyfin-cache
+          subPath: config/jellyfin-cache
         - name: movies
           mountPath: /media/movies
+          subPath: movies
           readOnly: true  # Jellyfin should never write to media
         - name: tv
           mountPath: /media/tv
+          subPath: tv
           readOnly: true
         resources:
           requests:
