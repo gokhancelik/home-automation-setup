@@ -88,6 +88,20 @@ spec:
         runAsUser: 1001
         runAsNonRoot: true
 
+      # Probes - extended timeouts for slow NFS I/O on Pi
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 600
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 30
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 60
+
     # Metrics (disabled due to image availability issues)
     metrics:
       enabled: false
