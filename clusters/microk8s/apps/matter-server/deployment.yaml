@@ -31,7 +31,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: matter-server
-        image: ghcr.io/home-assistant-libs/python-matter-server:8.1.2
+        image: ghcr.io/home-assistant-libs/python-matter-server:stable
         ports:
         - containerPort: 5580
           name: websocket
