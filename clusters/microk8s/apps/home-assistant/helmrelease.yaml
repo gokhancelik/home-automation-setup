@@ -12,8 +12,8 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.2.1
-      interval: 1m
+      version: 1.2.2
+      interval: 5m
   values:
     # Override specific values that are environment-specific
     # All other values come from the chart's default values.yaml

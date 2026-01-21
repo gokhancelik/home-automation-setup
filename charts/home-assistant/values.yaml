@@ -20,12 +20,6 @@ homeAssistant:
     # Core configuration
     homeassistant:
       name: Home
-      latitude: !secret latitude
-      longitude: !secret longitude
-      elevation: 0
-      unit_system: metric
-      time_zone: !secret timezone
-      country: NL
       external_url: https://ha.gcelik.dev
       internal_url: http://home-assistant.home-automation.svc.cluster.local:8123
 
