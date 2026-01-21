@@ -72,9 +72,6 @@ spec:
         - -c
         - |
           cat > /config/secrets.yaml << EOF
-          latitude: $LATITUDE
-          longitude: $LONGITUDE
-          timezone: $TIMEZONE
           api_password: $API_PASSWORD
           influxdb_token: $INFLUXDB_TOKEN
           postgresql_url: $POSTGRESQL_URL
