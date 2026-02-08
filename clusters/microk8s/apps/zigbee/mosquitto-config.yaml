@@ -58,6 +58,11 @@ data:
     # Home Assistant user
     user homeassistant
     topic readwrite #
+    
+    # Frigate NVR user
+    user frigate
+    topic readwrite frigate/#
+    topic readwrite homeassistant/#
   
   password_file: |
     # Placeholder - will be replaced by init container

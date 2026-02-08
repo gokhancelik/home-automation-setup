@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frigate-config
+  namespace: frigate
+data:
+  config.yml: |
+    # Frigate NVR Configuration
+    # https://docs.frigate.video/configuration/
+
+    mqtt:
+      host: mosquitto.zigbee.svc.cluster.local
+      port: 1883
+      user: "{FRIGATE_MQTT_USER}"
+      password: "{FRIGATE_MQTT_PASSWORD}"
+      topic_prefix: frigate
+
+    # CPU-based detection (no Coral TPU)
+    detectors:
+      cpu:
+        type: cpu
+        num_threads: 2
+
+    # Database for event metadata
+    database:
+      path: /config/frigate.db
+
+    # Recording and snapshot storage
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: motion
+      events:
+        retain:
+          default: 30
+          mode: active_objects
+
+    snapshots:
+      enabled: true
+      retain:
+        default: 30
+
+    # Object detection settings (optimized for doorbell camera)
+    objects:
+      track:
+        - person
+        - package
+        - dog
+        - cat
+        - car
+      filters:
+        person:
+          min_score: 0.5
+          threshold: 0.7
+        package:
+          min_score: 0.5
+          threshold: 0.7
+
+    # Camera configuration
+    cameras:
+      doorbell:
+        enabled: true
+        ffmpeg:
+          inputs:
+            - path: rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@192.168.2.12:8554/ch3
+              roles:
+                - detect
+            - path: rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@192.168.2.12:8554/ch1
+              roles:
+                - record
+        detect:
+          width: 640
+          height: 480
+          fps: 5
+        objects:
+          track:
+            - person
+            - package
+            - dog
+            - cat
+            - car
+        zones:
+          front_porch:
+            coordinates: 0,480,640,480,640,200,0,200
+        review:
+          alerts:
+            labels:
+              - person
+              - package
+          detections:
+            labels:
+              - dog
+              - cat
+              - car

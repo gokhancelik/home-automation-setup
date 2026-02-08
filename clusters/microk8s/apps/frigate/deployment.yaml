@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frigate
+  namespace: frigate
+  labels:
+    app: frigate
+    app.kubernetes.io/name: frigate
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: frigate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
+      initContainers:
+        - name: setup-config
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Copy config template to writable config volume
+              cp /config-template/config.yml /config/config.yml
+
+              # Inject MQTT credentials
+              sed -i "s/{FRIGATE_MQTT_USER}/$MQTT_USER/" /config/config.yml
+              sed -i "s/{FRIGATE_MQTT_PASSWORD}/$MQTT_PASSWORD/" /config/config.yml
+
+              # Inject camera RTSP credentials
+              sed -i "s/{CAMERA_USER}/$CAMERA_USER/g" /config/config.yml
+              sed -i "s/{CAMERA_PASSWORD}/$CAMERA_PASSWORD/g" /config/config.yml
+          env:
+            - name: MQTT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: mqtt-user
+            - name: MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: mqtt-password
+            - name: CAMERA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: camera-user
+            - name: CAMERA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: camera-password
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: config-template
+              mountPath: /config-template
+      containers:
+        - name: frigate
+          image: ghcr.io/blakeblackshear/frigate:0.14.1
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+            - containerPort: 8554
+              name: rtsp
+              protocol: TCP
+            - containerPort: 8555
+              name: webrtc-tcp
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "Europe/Amsterdam"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media/frigate
+            - name: shm
+              mountPath: /dev/shm
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+          livenessProbe:
+            httpGet:
+              path: /api/version
+              port: 5000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/version
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: frigate-config
+        - name: config-template
+          configMap:
+            name: frigate-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: frigate-media
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frigate
+  namespace: frigate
+  labels:
+    app: frigate
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 8554
+      targetPort: rtsp
+      protocol: TCP
+      name: rtsp
+    - port: 8555
+      targetPort: webrtc-tcp
+      protocol: TCP
+      name: webrtc-tcp
+  selector:
+    app: frigate

@@ -31,6 +31,7 @@ spec:
           # Create password file with hashed passwords from secrets
           echo "zigbee2mqtt:$ZIGBEE2MQTT_PASSWORD" > /tmp/passwords.txt
           echo "homeassistant:$HOMEASSISTANT_PASSWORD" >> /tmp/passwords.txt
+          echo "frigate:$FRIGATE_PASSWORD" >> /tmp/passwords.txt
           
           # Hash passwords using mosquitto_passwd
           touch /mosquitto/config/password_file
@@ -51,6 +52,11 @@ spec:
             secretKeyRef:
               name: mqtt-credentials
               key: homeassistant-password
+        - name: FRIGATE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mqtt-credentials
+              key: frigate-password
         volumeMounts:
         - name: config
           mountPath: /mosquitto/config
