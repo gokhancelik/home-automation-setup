@@ -63,10 +63,10 @@ data:
         enabled: true
         ffmpeg:
           inputs:
-            - path: rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@192.168.2.12:8554/ch3
+            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch3
               roles:
                 - detect
-            - path: rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@192.168.2.12:8554/ch1
+            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch1
               roles:
                 - record
         detect:
@@ -88,6 +88,36 @@ data:
             labels:
               - person
               - package
+          detections:
+            labels:
+              - dog
+              - cat
+              - car
+
+      backyard:
+        enabled: true
+        ffmpeg:
+          inputs:
+            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch4
+              roles:
+                - detect
+            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch1
+              roles:
+                - record
+        detect:
+          width: 640
+          height: 360
+          fps: 5
+        objects:
+          track:
+            - person
+            - dog
+            - cat
+            - car
+        review:
+          alerts:
+            labels:
+              - person
           detections:
             labels:
               - dog

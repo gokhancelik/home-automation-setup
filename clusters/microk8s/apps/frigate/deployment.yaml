@@ -34,9 +34,13 @@ spec:
               sed -i "s/{FRIGATE_MQTT_USER}/$MQTT_USER/" /config/config.yml
               sed -i "s/{FRIGATE_MQTT_PASSWORD}/$MQTT_PASSWORD/" /config/config.yml
 
-              # Inject camera RTSP credentials
-              sed -i "s/{CAMERA_USER}/$CAMERA_USER/g" /config/config.yml
-              sed -i "s/{CAMERA_PASSWORD}/$CAMERA_PASSWORD/g" /config/config.yml
+              # Inject doorbell camera credentials
+              sed -i "s/{DOORBELL_USER}/$DOORBELL_USER/g" /config/config.yml
+              sed -i "s/{DOORBELL_PASSWORD}/$DOORBELL_PASSWORD/g" /config/config.yml
+
+              # Inject backyard camera credentials
+              sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
+              sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
           env:
             - name: MQTT_USER
               valueFrom:
@@ -48,16 +52,26 @@ spec:
                 secretKeyRef:
                   name: frigate-credentials
                   key: mqtt-password
-            - name: CAMERA_USER
+            - name: DOORBELL_USER
               valueFrom:
                 secretKeyRef:
                   name: frigate-credentials
-                  key: camera-user
-            - name: CAMERA_PASSWORD
+                  key: doorbell-user
+            - name: DOORBELL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: frigate-credentials
-                  key: camera-password
+                  key: doorbell-password
+            - name: BACKYARD_USER
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: backyard-user
+            - name: BACKYARD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: backyard-password
           volumeMounts:
             - name: config
               mountPath: /config
