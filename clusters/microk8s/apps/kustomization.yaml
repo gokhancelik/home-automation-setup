@@ -5,5 +5,5 @@ resources:
   - home-assistant/
   - matter-server/
   - zigbee/
-  # - frigate/  # Disabled until sealed secrets are generated
+  - frigate/
   - test-web/
