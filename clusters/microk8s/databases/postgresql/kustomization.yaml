@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - pvc.yaml
   - helmrelease.yaml
-  - sealed-secret.yaml
+  - sealed-secrets.yaml
   - backup-pvc.yaml
   - backup-cronjob.yaml
