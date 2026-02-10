@@ -54,10 +54,16 @@ USB devices (Zigbee coordinators) may be mounted to **one pod only**.
 
 ### Hardware
 
-- Raspberry Pi 4 or 5 (8 GB RAM)
-- ARM64
-- Boot from SSD (not SD card)
-- Single-node k3s cluster
+- **Master Node:** Ubuntu Desktop (`192.168.2.43`)
+  - Control Plane
+  - PostgreSQL / InfluxDB (Heavy write loads)
+  - Frigate (Object Detection / Transcoding)
+- **Worker Node:** Raspberry Pi 4B (8GB RAM) (`192.168.2.109`)
+  - Zigbee/Matter USB Coordinators (Hardware affinity)
+  - Lightweight pods
+- **Architecture:** Mixed (x86_64 + ARM64)
+- **Cluster:** MicroK8s Multi-node
+- **Storage:** NAS-backed PersistentVolumes (NFS)
 
 ### Storage
 

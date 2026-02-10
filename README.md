@@ -266,6 +266,47 @@ Set up Flux CD (GitOps operator) to manage Kubernetes manifests and Helm release
 
     All Flux pods should be running and ready.
 
+## Step 6: Expand Cluster (Add Worker Nodes)
+
+### Adding Ubuntu Desktop (192.168.2.43) as Master (Planned Migration)
+
+We intend to migrate the Control Plane to the Ubuntu Desktop for better performance, keeping the Raspberry Pi as a worker node for USB-bound services (Zigbee/Matter).
+
+**Migration Strategy (High Level):**
+1.  **Backup**: Ensure all PVCs (Postgres, InfluxDB, HA Config) and Flux manifests are backed up.
+2.  **Provision**: Install MicroK8s on `ubuntu-desktop` as a fresh cluster.
+3.  **Bootstrap**: Run `flux bootstrap` on `ubuntu-desktop` to restore the cluster state from Git.
+4.  **Restore Data**: Restore PostgreSQL and InfluxDB data from backups.
+5.  **Join Pi**: Wipe MicroK8s on `pi-lab` and join it to the new cluster as a worker.
+6.  **Affinity**: Update deployments to pin USB services (Zigbee) to the Pi.
+
+### Adding Ubuntu Desktop (192.168.2.43) as Worker (Temporary)
+
+To add `ubuntu-desktop` as a worker node to the existing cluster (before migration):
+
+1.  **Install MicroK8s on the new node (ubuntu-desktop):**
+    ```bash
+    ssh <user>@192.168.2.43
+    sudo snap install microk8s --classic
+    sudo usermod -aG microk8s $USER
+    sudo chown -f -R $USER ~/.kube
+    # Log out and back in
+    ```
+
+2.  **Generate Join Token on Master (pi-lab):**
+    ```bash
+    ssh gokhan@192.168.2.109
+    microk8s add-node
+    ```
+
+3.  **Join the Cluster:**
+    Copy the output command from the previous step (it looks like `microk8s join 192.168.2.109:25000/hex-token`) and run it on `ubuntu-desktop`.
+
+4.  **Verify Node Status (on Master):**
+    ```bash
+    kubectl get nodes
+    ```
+
 ## Home Assistant with Matter Support
 
 This repository includes a Home Assistant deployment with full Matter support for smart home automation.

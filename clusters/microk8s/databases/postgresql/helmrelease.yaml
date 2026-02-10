@@ -51,9 +51,9 @@ spec:
         storageClass: ""
         size: 10Gi
 
-      # Node selector to run on pi-lab (where NFS is mounted)
+      # Node selector to run on ubuntu-desktop (requires NAS mount)
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
+        kubernetes.io/hostname: ubuntu-desktop
 
       # Resources
       resources:
