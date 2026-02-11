@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/instance: home-assistant
     spec:
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
+        kubernetes.io/hostname: ubuntu-desktop
       {{- if .Values.networking.hostNetwork }}
       hostNetwork: {{ .Values.networking.hostNetwork }}
       dnsPolicy: {{ .Values.networking.dnsPolicy | default "ClusterFirstWithHostNet" }}
