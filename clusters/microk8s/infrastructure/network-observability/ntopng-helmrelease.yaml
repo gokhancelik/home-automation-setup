@@ -8,11 +8,20 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: ./infrastructure/network-observability/ntopng
+      chart: ntopng
+      version: ">=0.1.0"
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: ntop
         namespace: flux-system
+      interval: 15m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
   values:
     image:
       repository: ntop/ntopng
