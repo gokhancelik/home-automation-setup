@@ -8,6 +8,9 @@ networking:
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
 
+nodeSelector:
+  kubernetes.io/hostname: ubuntu-desktop
+
 # Security context - only fsGroup to allow init containers to write files
 securityContext:
   fsGroup: 1000

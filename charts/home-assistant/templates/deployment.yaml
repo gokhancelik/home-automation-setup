@@ -20,8 +20,10 @@ spec:
         app.kubernetes.io/name: home-assistant
         app.kubernetes.io/instance: home-assistant
     spec:
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        kubernetes.io/hostname: ubuntu-desktop
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.networking.hostNetwork }}
       hostNetwork: {{ .Values.networking.hostNetwork }}
       dnsPolicy: {{ .Values.networking.dnsPolicy | default "ClusterFirstWithHostNet" }}
