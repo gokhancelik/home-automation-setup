@@ -56,6 +56,11 @@ data:
         package:
           min_score: 0.5
           threshold: 0.7
+        car:
+          min_score: 0.5
+          threshold: 0.7
+          # Stop recording stationary cars after 30 seconds
+          max_disappeared: 30
 
     # Camera configuration
     cameras:
@@ -80,6 +85,10 @@ data:
             - dog
             - cat
             - car
+          filters:
+            car:
+              # Stop tracking stationary cars after 30 seconds
+              max_disappeared: 30
         zones:
           front_porch:
             coordinates: 0,480,640,480,640,200,0,200
