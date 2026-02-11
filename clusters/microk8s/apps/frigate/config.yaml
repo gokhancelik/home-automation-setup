@@ -66,13 +66,13 @@ data:
             - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch3
               roles:
                 - detect
-            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch1
+            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch3  # Use lower quality for recording too
               roles:
                 - record
         detect:
           width: 640
           height: 480
-          fps: 5
+          fps: 3  # Reduced from 5 to save bandwidth
         objects:
           track:
             - person
@@ -95,25 +95,24 @@ data:
               - car
 
       backyard:
-        enabled: false  # DISABLED - camera not responding, causing network saturation
+        enabled: true  # Re-enabled - camera is active
         ffmpeg:
           inputs:
             - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch4
               roles:
                 - detect
-            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch1
+            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch3  # Lower quality stream for recording
               roles:
                 - record
         detect:
           width: 640
           height: 360
-          fps: 5
+          fps: 3  # Reduced from 5 to save bandwidth
         objects:
           track:
             - person
             - dog
             - cat
-            - car
         review:
           alerts:
             labels:
@@ -122,4 +121,3 @@ data:
             labels:
               - dog
               - cat
-              - car
