@@ -9,7 +9,7 @@ networking:
   dnsPolicy: ClusterFirstWithHostNet
 
 nodeSelector:
-  kubernetes.io/hostname: ubuntu-desktop
+  kubernetes.io/hostname: pi-lab
 
 # Security context - only fsGroup to allow init containers to write files
 securityContext:
