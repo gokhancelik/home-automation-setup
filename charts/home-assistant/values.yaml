@@ -1,5 +1,5 @@
 image:
-  repository: home-assistant/home-assistant
+  repository: docker.io/homeassistant/home-assistant
   tag: "2026.1.2"
   pullPolicy: IfNotPresent
 
@@ -164,3 +164,4 @@ resources:
   limits:
     cpu: 1000m
     memory: 2Gi
+
