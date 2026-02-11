@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ntopng.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ntopng.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "ntopng.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ntopng.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      containers:
+      - name: ntopng
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          - "--community"
+          - "--http-port"
+          - "3000"
+          - "--data-dir"
+          - "/var/lib/ntopng"
+          {{- if .Values.netflow.enabled }}
+          - "--zmq"
+          - "tcp://*:{{ .Values.netflow.port }}"
+          {{- end }}
+          - "--local-networks"
+          - "{{ .Values.config.localNetworks }}"
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        {{- if .Values.netflow.enabled }}
+        - name: netflow
+          containerPort: {{ .Values.netflow.port }}
+          protocol: UDP
+        {{- end }}
+        {{- if .Values.sflow.enabled }}
+        - name: sflow
+          containerPort: {{ .Values.sflow.port }}
+          protocol: UDP
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/ntopng
+      volumes:
+      - name: data
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "ntopng.fullname" . }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}

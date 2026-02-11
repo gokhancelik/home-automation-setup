@@ -1,0 +1,108 @@
+{
+  "dashboard": {
+    "title": "Network Traffic Analysis",
+    "tags": ["network", "traffic", "wan"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "WAN Utilization %",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "(rate(ifHCOutOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8) / ifSpeed{ifDescr=~\".*WAN.*\"} * 100",
+            "legendFormat": "Upload %",
+            "refId": "A"
+          },
+          {
+            "expr": "(rate(ifHCInOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8) / ifSpeed{ifDescr=~\".*WAN.*\"} * 100",
+            "legendFormat": "Download %",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "max": 100, "min": 0},
+          {"format": "short"}
+        ]
+      },
+      {
+        "title": "WAN Bandwidth (Mbps)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(ifHCOutOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8 / 1000000",
+            "legendFormat": "Upload",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(ifHCInOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8 / 1000000",
+            "legendFormat": "Download",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "Mbits", "min": 0},
+          {"format": "short"}
+        ]
+      },
+      {
+        "title": "Packet Drops",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(ifInDiscards[5m])",
+            "legendFormat": "{{ ifDescr }} - In",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(ifOutDiscards[5m])",
+            "legendFormat": "{{ ifDescr }} - Out",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "Interface Errors",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(ifInErrors[5m])",
+            "legendFormat": "{{ ifDescr }} - In Errors",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(ifOutErrors[5m])",
+            "legendFormat": "{{ ifDescr }} - Out Errors",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "All Interfaces Traffic",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(ifHCInOctets[5m]) * 8 / 1000000",
+            "legendFormat": "{{ ifDescr }} - In",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(ifHCOutOctets[5m]) * 8 / 1000000",
+            "legendFormat": "{{ ifDescr }} - Out",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "Mbits", "min": 0},
+          {"format": "short"}
+        ]
+      }
+    ],
+    "refresh": "30s",
+    "time": {"from": "now-6h", "to": "now"}
+  }
+}
