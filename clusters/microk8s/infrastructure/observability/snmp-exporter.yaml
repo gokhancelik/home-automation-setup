@@ -6,6 +6,7 @@ metadata:
   namespace: observability
 data:
   snmp.yml: |
+    # SNMPv2 authentication
     auths:
       public_v2:
         community: public
@@ -27,14 +28,19 @@ data:
           - 1.3.6.1.2.1.31.1.1.1.6  # ifHCInOctets
           - 1.3.6.1.2.1.31.1.1.1.10 # ifHCOutOctets
           - 1.3.6.1.2.1.2.2.1.5   # ifSpeed
-        lookups:
-          - source_indexes: [ifIndex]
-            lookup: ifName
-          - source_indexes: [ifIndex]
-            lookup: ifDescr
-        overrides:
-          ifOperStatus:
-            type: gauge
+        metrics:
+          - name: ifInOctets
+            oid: 1.3.6.1.2.1.2.2.1.10
+            type: counter
+            indexes:
+              - labelname: ifIndex
+                type: gauge
+          - name: ifOutOctets
+            oid: 1.3.6.1.2.1.2.2.1.16
+            type: counter
+            indexes:
+              - labelname: ifIndex
+                type: gauge
 ---
 apiVersion: apps/v1
 kind: Deployment
