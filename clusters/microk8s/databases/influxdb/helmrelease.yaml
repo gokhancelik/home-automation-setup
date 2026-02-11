@@ -42,7 +42,7 @@ spec:
     # Persistence configuration
     persistence:
       enabled: true
-      storageClass: "nfs-storage"
+      storageClass: "microk8s-hostpath"
       size: 20Gi
       accessMode: ReadWriteOnce
 
@@ -56,38 +56,36 @@ spec:
       port: 8086
       targetPort: 8086
 
-    # Resources
+    # Resources - Increased for ubuntu-desktop with local SSD storage
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
         cpu: 500m
         memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
 
     # InfluxDB engine configuration
-    # Optimized for Raspberry Pi with long-term storage
+    # Optimized for local SSD storage with increased resources
     env:
       - name: INFLUXD_STORAGE_SHARD_PRECREATOR_CHECK_INTERVAL
         value: "10m"
       - name: INFLUXD_STORAGE_SHARD_PRECREATOR_ADVANCE_PERIOD
         value: "30m"
       # Shard group duration: 7 days
-      # Balances query performance with file count on NFS
-      # Longer duration = fewer files, better for Pi/NFS
-      # Shorter duration = more granular data management
+      # Tuned for local SSD with more memory available
       - name: INFLUXD_STORAGE_CACHE_MAX_MEMORY_SIZE
-        value: "256m"
+        value: "1g"
       - name: INFLUXD_STORAGE_CACHE_SNAPSHOT_MEMORY_SIZE
-        value: "64m"
+        value: "256m"
       - name: INFLUXD_STORAGE_CACHE_SNAPSHOT_WRITE_COLD_DURATION
         value: "10m"
       - name: INFLUXD_STORAGE_COMPACT_FULL_WRITE_COLD_DURATION
-        value: "4h"
+        value: "2h"
       - name: INFLUXD_STORAGE_COMPACT_THROUGHPUT_BURST
-        value: "48m"
+        value: "96m"
       - name: INFLUXD_STORAGE_MAX_CONCURRENT_COMPACTIONS
-        value: "2"
+        value: "4"
       - name: INFLUXD_STORAGE_MAX_INDEX_LOG_FILE_SIZE
         value: "1m"
       - name: INFLUXD_STORAGE_SERIES_ID_SET_CACHE_SIZE
