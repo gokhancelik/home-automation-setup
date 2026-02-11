@@ -13,6 +13,8 @@ spec:
       labels:
         app: test-web
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: pi-lab
       containers:
       - name: nginx
         image: nginx:alpine
