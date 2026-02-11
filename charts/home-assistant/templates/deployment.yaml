@@ -25,6 +25,10 @@ spec:
       {{- if .Values.networking.hostNetwork }}
       hostNetwork: {{ .Values.networking.hostNetwork }}
       dnsPolicy: {{ .Values.networking.dnsPolicy | default "ClusterFirstWithHostNet" }}
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       {{- end }}
       initContainers:
       - name: install-hacs
