@@ -13,3 +13,6 @@ resources:
   - grafana-deployment.yaml
   - grafana-ingress.yaml
   - grafana-dashboards.yaml
+  - prometheus-helmrelease.yaml
+  - prometheus-alerts.yaml
+  - snmp-exporter.yaml

@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: prometheus
-  namespace: data-storage
+  namespace: observability
 spec:
   interval: 15m
   chart:
@@ -56,7 +56,7 @@ spec:
             - source_labels: [__param_target]
               target_label: instance
             - target_label: __address__
-              replacement: snmp-exporter:9116
+              replacement: snmp-exporter.observability.svc.cluster.local:9116
 
     alertmanager:
       enabled: false

@@ -3,12 +3,3 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - ntopng-helmrelease.yaml
-
----
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: data-storage
-resources:
-  - prometheus/helmrelease.yaml
-  - prometheus/alerts.yaml
-  - snmp-exporter/deployment.yaml

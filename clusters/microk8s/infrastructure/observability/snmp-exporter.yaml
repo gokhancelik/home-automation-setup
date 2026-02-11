@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: snmp-exporter-config
-  namespace: data-storage
+  namespace: observability
 data:
   snmp.yml: |
     auths:
@@ -40,7 +40,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: snmp-exporter
-  namespace: data-storage
+  namespace: observability
   labels:
     app: snmp-exporter
 spec:
@@ -82,7 +82,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: snmp-exporter
-  namespace: data-storage
+  namespace: observability
   labels:
     app: snmp-exporter
 spec:

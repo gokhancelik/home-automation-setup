@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-network-alerts
-  namespace: data-storage
+  namespace: observability
 data:
   network-alerts.yml: |
     groups:
