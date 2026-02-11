@@ -48,7 +48,7 @@ data:
         - package
         - dog
         - cat
-        # Removed car from global tracking to prevent stationary car issues
+        - car  # Re-added - stationary tracking prevents continuous recording
       filters:
         person:
           min_score: 0.5
@@ -79,7 +79,7 @@ data:
             - package
             - dog
             - cat
-            # Removed car - prevents stationary car continuous recording
+            - car  # Re-added - Frigate's stationary tracking handles parked cars
         zones:
           front_porch:
             coordinates: 0,480,640,480,640,200,0,200
