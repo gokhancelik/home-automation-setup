@@ -16,7 +16,7 @@ spec:
         app: grafana
     spec:
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
+        kubernetes.io/hostname: ubuntu-desktop
       securityContext:
         runAsUser: 472
         runAsGroup: 472

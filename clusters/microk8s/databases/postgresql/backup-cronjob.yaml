@@ -85,4 +85,4 @@ spec:
             persistentVolumeClaim:
               claimName: postgresql-backup-pvc
           nodeSelector:
-            kubernetes.io/hostname: pi-lab
+            kubernetes.io/hostname: ubuntu-desktop

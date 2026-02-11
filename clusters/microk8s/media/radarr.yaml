@@ -89,7 +89,7 @@ spec:
         app: radarr
     spec:
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
+        kubernetes.io/hostname: ubuntu-desktop
       containers:
       - name: radarr
         image: lscr.io/linuxserver/radarr:5.2.6

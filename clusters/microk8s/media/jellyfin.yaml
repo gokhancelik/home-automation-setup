@@ -56,7 +56,7 @@ spec:
         app: jellyfin
     spec:
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
+        kubernetes.io/hostname: ubuntu-desktop
       containers:
       - name: jellyfin
         image: lscr.io/linuxserver/jellyfin:10.8.13
