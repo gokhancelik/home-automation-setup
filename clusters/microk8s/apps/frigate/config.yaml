@@ -48,7 +48,7 @@ data:
         - package
         - dog
         - cat
-        - car
+        # Removed car from global tracking to prevent stationary car issues
       filters:
         person:
           min_score: 0.5
@@ -56,11 +56,6 @@ data:
         package:
           min_score: 0.5
           threshold: 0.7
-        car:
-          min_score: 0.5
-          threshold: 0.7
-          # Stop recording stationary cars after 30 seconds
-          max_disappeared: 30
 
     # Camera configuration
     cameras:
@@ -84,11 +79,7 @@ data:
             - package
             - dog
             - cat
-            - car
-          filters:
-            car:
-              # Stop tracking stationary cars after 30 seconds
-              max_disappeared: 30
+            # Removed car - prevents stationary car continuous recording
         zones:
           front_porch:
             coordinates: 0,480,640,480,640,200,0,200
