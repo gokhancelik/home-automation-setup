@@ -30,7 +30,7 @@ data:
       enabled: true
       retain:
         days: 7
-        mode: motion
+        mode: active_objects  # Only record when objects detected (was: motion)
       events:
         retain:
           default: 30
@@ -95,7 +95,7 @@ data:
               - car
 
       backyard:
-        enabled: true
+        enabled: false  # DISABLED - camera not responding, causing network saturation
         ffmpeg:
           inputs:
             - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch4
