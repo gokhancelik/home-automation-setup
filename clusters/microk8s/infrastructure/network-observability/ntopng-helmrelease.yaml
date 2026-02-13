@@ -8,7 +8,7 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: ./ntopng
+      chart: ./clusters/microk8s/infrastructure/network-observability/ntopng
       sourceRef:
         kind: GitRepository
         name: flux-system
