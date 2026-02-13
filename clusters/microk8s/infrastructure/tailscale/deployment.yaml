@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailscale-subnet-router
+  namespace: tailscale
+  labels:
+    app: tailscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailscale
+  template:
+    metadata:
+      labels:
+        app: tailscale
+    spec:
+      serviceAccountName: tailscale
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-desktop
+      containers:
+      - name: tailscale
+        image: tailscale/tailscale:latest
+        imagePullPolicy: Always
+        env:
+        - name: TS_AUTHKEY
+          valueFrom:
+            secretKeyRef:
+              name: tailscale-auth
+              key: TS_AUTHKEY
+        - name: TS_ROUTES
+          value: "192.168.2.0/24"
+        - name: TS_STATE_DIR
+          value: /var/lib/tailscale
+        - name: TS_USERSPACE
+          value: "false"
+        - name: TS_ACCEPT_DNS
+          value: "true"
+        - name: TS_HOSTNAME
+          value: "home-k8s-gateway"
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        volumeMounts:
+        - name: dev-net-tun
+          mountPath: /dev/net/tun
+        - name: state
+          mountPath: /var/lib/tailscale
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      volumes:
+      - name: dev-net-tun
+        hostPath:
+          path: /dev/net/tun
+          type: CharDevice
+      - name: state
+        persistentVolumeClaim:
+          claimName: tailscale-state
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tailscale-state
+  namespace: tailscale
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+  resources:
+    requests:
+      storage: 1Gi
