@@ -54,6 +54,10 @@ spec:
           mountPath: /etc/grafana
         - name: grafana-datasources
           mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboard-provider
+          mountPath: /etc/grafana/provisioning/dashboards/provider
+        - name: grafana-dashboards
+          mountPath: /etc/grafana/provisioning/dashboards
         - name: grafana-storage
           mountPath: /var/lib/grafana
         resources:
@@ -76,6 +80,15 @@ spec:
           items:
           - key: datasources.yaml
             path: datasources.yaml
+      - name: grafana-dashboard-provider
+        configMap:
+          name: grafana-dashboard-provider
+          items:
+          - key: dashboards.yaml
+            path: dashboards.yaml
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
       - name: grafana-storage
         persistentVolumeClaim:
           claimName: grafana-storage
