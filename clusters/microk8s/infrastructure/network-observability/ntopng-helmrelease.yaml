@@ -24,7 +24,7 @@ spec:
   values:
     image:
       repository: ntop/ntopng
-      tag: "5.6"
+      tag: "latest"
     
     ingress:
       enabled: true
