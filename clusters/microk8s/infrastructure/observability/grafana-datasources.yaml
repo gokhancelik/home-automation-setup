@@ -8,19 +8,34 @@ data:
     apiVersion: 1
     
     datasources:
+      # Prometheus - Metrics from cluster and SNMP
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server.observability.svc.cluster.local
+        isDefault: true
+        editable: true
+        jsonData:
+          timeInterval: 30s
+          queryTimeout: 60s
+      
+      # Loki - Log aggregation
       - name: Loki
         type: loki
         access: proxy
-        url: http://loki:3100
+        url: http://loki.observability.svc.cluster.local:3100
         isDefault: false
         editable: true
-        
+        jsonData:
+          maxLines: 1000
+          
+      # InfluxDB - Home Assistant metrics (long-term)
       - name: InfluxDB
         type: influxdb
         access: proxy
         url: http://influxdb-influxdb2.data-storage.svc.cluster.local:8086
         database: home-assistant
-        isDefault: true
+        isDefault: false
         editable: true
         jsonData:
           version: Flux
@@ -28,4 +43,4 @@ data:
           defaultBucket: home-assistant
           tlsSkipVerify: true
         secureJsonData:
-          token: "INFLUXDB_TOKEN_PLACEHOLDER"
+          token: "influxdb-admin-token-2025-secure"
