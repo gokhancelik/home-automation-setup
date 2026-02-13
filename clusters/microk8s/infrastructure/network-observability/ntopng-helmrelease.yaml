@@ -8,11 +8,10 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: ntopng
-      version: ">=0.1.0"
+      chart: ./ntopng
       sourceRef:
-        kind: HelmRepository
-        name: ntop
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
       interval: 15m
   install:
