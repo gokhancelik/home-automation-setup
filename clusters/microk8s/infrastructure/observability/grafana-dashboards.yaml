@@ -6,613 +6,462 @@ metadata:
   labels:
     grafana_dashboard: "1"
 data:
-  home-assistant-dashboard.json: |
+  cluster-overview.json: |
     {
-      "title": "Home Assistant Overview",
-      "tags": ["home-assistant", "smart-home"],
-      "timezone": "browser",
-      "schemaVersion": 16,
-      "version": 1,
-      "refresh": "30s",
-      "panels": [
-        {
-          "id": 1,
-          "title": "Pod Status",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
-          "targets": [
-            {
-              "expr": "up{job=\"home-assistant\"}",
-              "legendFormat": "Status",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "values": false,
-              "calcs": ["lastNotNull"]
-            }
-          }
-        },
-        {
-          "id": 2,
-          "title": "Memory Usage",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
-          "targets": [
-            {
-              "expr": "container_memory_usage_bytes{namespace=\"home-automation\",container=\"home-assistant\"}",
-              "legendFormat": "Memory Used",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "title": "CPU Usage",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
-          "targets": [
-            {
-              "expr": "rate(container_cpu_usage_seconds_total{namespace=\"home-automation\",container=\"home-assistant\"}[5m])",
-              "legendFormat": "CPU",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "title": "Recent Logs",
-          "type": "logs",
-          "gridPos": {"h": 12, "w": 24, "x": 0, "y": 12},
-          "targets": [
-            {
-              "expr": "{namespace=\"home-automation\", app_kubernetes_io_name=\"home-assistant\"}",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "showTime": true,
-            "showLabels": false,
-            "wrapLogMessage": true
-          }
-        },
-        {
-          "id": 5,
-          "title": "Error Rate",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
-          "targets": [
-            {
-              "expr": "count_over_time({namespace=\"home-automation\"} |~ \"(?i)error|exception|failed\" [5m])",
-              "legendFormat": "Errors",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 6,
-          "title": "Restart Count",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
-          "targets": [
-            {
-              "expr": "kube_pod_container_status_restarts_total{namespace=\"home-automation\",container=\"home-assistant\"}",
-              "legendFormat": "Restarts",
-              "refId": "A"
-            }
-          ]
-        }
-      ]
-    }
-  
-  storage-dashboard.json: |
+  "title": "Kubernetes Cluster Overview",
+  "tags": ["kubernetes", "cluster", "overview"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
     {
-      "title": "Storage & NAS Overview",
-      "tags": ["storage", "nas", "persistence"],
-      "timezone": "browser",
-      "schemaVersion": 16,
-      "version": 1,
-      "refresh": "1m",
-      "panels": [
+      "id": 1,
+      "title": "Cluster Nodes Status",
+      "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "targets": [
         {
-          "id": 1,
-          "title": "PVC Usage - Home Assistant",
-          "type": "gauge",
-          "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
-          "targets": [
-            {
-              "expr": "(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"home-assistant-data\"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"home-assistant-data\"}) * 100",
-              "legendFormat": "Used %",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "showThresholdLabels": true,
-            "showThresholdMarkers": true
-          },
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "green"},
-                  {"value": 75, "color": "yellow"},
-                  {"value": 90, "color": "red"}
-                ]
-              },
-              "unit": "percent"
-            }
-          }
-        },
-        {
-          "id": 2,
-          "title": "PVC Usage - InfluxDB",
-          "type": "gauge",
-          "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
-          "targets": [
-            {
-              "expr": "(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}) * 100",
-              "legendFormat": "Used %",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "showThresholdLabels": true,
-            "showThresholdMarkers": true
-          },
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "green"},
-                  {"value": 50, "color": "yellow"},
-                  {"value": 75, "color": "red"}
-                ]
-              },
-              "unit": "percent"
-            }
-          }
-        },
-        {
-          "id": 3,
-          "title": "PVC Usage - PostgreSQL",
-          "type": "gauge",
-          "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
-          "targets": [
-            {
-              "expr": "(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"postgresql-data\"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"postgresql-data\"}) * 100",
-              "legendFormat": "Used %",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "showThresholdLabels": true,
-            "showThresholdMarkers": true
-          },
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "green"},
-                  {"value": 75, "color": "yellow"},
-                  {"value": 90, "color": "red"}
-                ]
-              },
-              "unit": "percent"
-            }
-          }
-        },
-        {
-          "id": 4,
-          "title": "PVC Usage - Loki",
-          "type": "gauge",
-          "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
-          "targets": [
-            {
-              "expr": "(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"loki-storage\"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"loki-storage\"}) * 100",
-              "legendFormat": "Used %",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "showThresholdLabels": true,
-            "showThresholdMarkers": true
-          },
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "green"},
-                  {"value": 75, "color": "yellow"},
-                  {"value": 90, "color": "red"}
-                ]
-              },
-              "unit": "percent"
-            }
-          }
-        },
-        {
-          "id": 5,
-          "title": "Storage Usage Trends (7 Days)",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 6},
-          "targets": [
-            {
-              "expr": "kubelet_volume_stats_used_bytes{namespace=~\"home-automation|data-storage|observability\"}",
-              "legendFormat": "{{persistentvolumeclaim}}",
-              "refId": "A"
-            }
-          ],
-          "yaxes": [
-            {"format": "bytes", "label": "Storage Used"},
-            {"format": "short"}
-          ]
-        },
-        {
-          "id": 6,
-          "title": "Total NAS Storage Allocated",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 8, "x": 0, "y": 14},
-          "targets": [
-            {
-              "expr": "sum(kubelet_volume_stats_capacity_bytes{namespace=~\"home-automation|data-storage|observability\"})",
-              "legendFormat": "Total Capacity",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "textMode": "value_and_name",
-            "colorMode": "background"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "bytes"
-            }
-          }
-        },
-        {
-          "id": 7,
-          "title": "Total NAS Storage Used",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 8, "x": 8, "y": 14},
-          "targets": [
-            {
-              "expr": "sum(kubelet_volume_stats_used_bytes{namespace=~\"home-automation|data-storage|observability\"})",
-              "legendFormat": "Total Used",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "textMode": "value_and_name",
-            "colorMode": "background"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "bytes"
-            }
-          }
-        },
-        {
-          "id": 8,
-          "title": "Storage Growth Rate (GB/day)",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 8, "x": 16, "y": 14},
-          "targets": [
-            {
-              "expr": "deriv(sum(kubelet_volume_stats_used_bytes{namespace=~\"home-automation|data-storage|observability\"})[24h:]) / 1024 / 1024 / 1024",
-              "legendFormat": "Growth Rate",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "textMode": "value_and_name",
-            "colorMode": "background"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "decgbytes"
-            }
-          }
-        }
-      ]
-    }
-  
-  influxdb-dashboard.json: |
-    {
-      "title": "InfluxDB Metrics",
-      "tags": ["influxdb", "metrics", "timeseries"],
-      "timezone": "browser",
-      "schemaVersion": 16,
-      "version": 1,
-      "refresh": "30s",
-      "panels": [
-        {
-          "id": 1,
-          "title": "InfluxDB Pod Status",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
-          "targets": [
-            {
-              "expr": "up{job=~\".*influxdb.*\"}",
-              "legendFormat": "Status",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "title": "Write Rate (points/sec)",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
-          "targets": [
-            {
-              "expr": "rate(container_network_receive_bytes_total{namespace=\"data-storage\",pod=~\"influxdb.*\"}[5m])",
-              "legendFormat": "Ingest Rate",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "title": "Memory Usage",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
-          "targets": [
-            {
-              "expr": "container_memory_usage_bytes{namespace=\"data-storage\",pod=~\"influxdb.*\"}",
-              "legendFormat": "Memory Used",
-              "refId": "A"
-            },
-            {
-              "expr": "container_spec_memory_limit_bytes{namespace=\"data-storage\",pod=~\"influxdb.*\"}",
-              "legendFormat": "Memory Limit",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "title": "CPU Usage",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
-          "targets": [
-            {
-              "expr": "rate(container_cpu_usage_seconds_total{namespace=\"data-storage\",pod=~\"influxdb.*\"}[5m])",
-              "legendFormat": "CPU Usage",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "title": "Storage Used",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
-          "targets": [
-            {
-              "expr": "kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}",
-              "legendFormat": "Storage Used",
-              "refId": "A"
-            },
-            {
-              "expr": "kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}",
-              "legendFormat": "Storage Capacity",
-              "refId": "B"
-            }
-          ],
-          "yaxes": [
-            {"format": "bytes"},
-            {"format": "short"}
-          ]
-        },
-        {
-          "id": 6,
-          "title": "Storage Utilization %",
-          "type": "gauge",
-          "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
-          "targets": [
-            {
-              "expr": "(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}) * 100",
-              "legendFormat": "Storage %",
-              "refId": "A"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "green"},
-                  {"value": 50, "color": "yellow"},
-                  {"value": 75, "color": "red"}
-                ]
-              },
-              "unit": "percent"
-            }
-          }
-        },
-        {
-          "id": 7,
-          "title": "InfluxDB Logs (Errors)",
-          "type": "logs",
-          "gridPos": {"h": 10, "w": 24, "x": 0, "y": 20},
-          "targets": [
-            {
-              "expr": "{namespace=\"data-storage\", pod=~\"influxdb.*\"} |~ \"(?i)error|warn\"",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "id": 8,
-          "title": "Data Retention Status",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
-          "targets": [
-            {
-              "expr": "vector(1)",
-              "legendFormat": "Infinite Retention",
-              "refId": "A"
-            }
-          ],
-          "options": {
-            "textMode": "name",
-            "colorMode": "background",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [
-                {
-                  "type": "value",
-                  "value": "1",
-                  "text": "Infinite (Multi-year)"
-                }
-              ],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "green"
-              }
-            }
-          }
-        },
-        {
-          "id": 9,
-          "title": "Estimated Days Until 75% Full",
-          "type": "stat",
-          "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
-          "targets": [
-            {
-              "expr": "((kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"} * 0.75) - kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}) / (deriv(kubelet_volume_stats_used_bytes{persistentvolumeclaim=\"influxdb-influxdb2\"}[7d]) * 86400)",
-              "legendFormat": "Days Remaining",
-              "refId": "A"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "d",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"value": 0, "color": "red"},
-                  {"value": 90, "color": "yellow"},
-                  {"value": 365, "color": "green"}
-                ]
-              }
-            }
-          }
-        }
-      ]
-    }
-  
-  network-dashboard.json: |
-    {
-      "title": "Network Traffic Analysis",
-      "tags": ["network", "traffic", "wan"],
-      "timezone": "browser",
-      "panels": [
-        {
-          "title": "WAN Utilization %",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
-          "targets": [
-            {
-              "expr": "(rate(ifHCOutOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8) / ifSpeed{ifDescr=~\".*WAN.*\"} * 100",
-              "legendFormat": "Upload %",
-              "refId": "A"
-            },
-            {
-              "expr": "(rate(ifHCInOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8) / ifSpeed{ifDescr=~\".*WAN.*\"} * 100",
-              "legendFormat": "Download %",
-              "refId": "B"
-            }
-          ],
-          "yaxes": [
-            {"format": "percent", "max": 100, "min": 0},
-            {"format": "short"}
-          ]
-        },
-        {
-          "title": "WAN Bandwidth (Mbps)",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
-          "targets": [
-            {
-              "expr": "rate(ifHCOutOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8 / 1000000",
-              "legendFormat": "Upload",
-              "refId": "A"
-            },
-            {
-              "expr": "rate(ifHCInOctets{ifDescr=~\".*WAN.*\"}[5m]) * 8 / 1000000",
-              "legendFormat": "Download",
-              "refId": "B"
-            }
-          ],
-          "yaxes": [
-            {"format": "Mbits", "min": 0},
-            {"format": "short"}
-          ]
-        },
-        {
-          "title": "Packet Drops",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
-          "targets": [
-            {
-              "expr": "rate(ifInDiscards[5m])",
-              "legendFormat": "{{ ifDescr }} - In",
-              "refId": "A"
-            },
-            {
-              "expr": "rate(ifOutDiscards[5m])",
-              "legendFormat": "{{ ifDescr }} - Out",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "title": "Interface Errors",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
-          "targets": [
-            {
-              "expr": "rate(ifInErrors[5m])",
-              "legendFormat": "{{ ifDescr }} - In Errors",
-              "refId": "A"
-            },
-            {
-              "expr": "rate(ifOutErrors[5m])",
-              "legendFormat": "{{ ifDescr }} - Out Errors",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "title": "All Interfaces Traffic",
-          "type": "graph",
-          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
-          "targets": [
-            {
-              "expr": "rate(ifHCInOctets[5m]) * 8 / 1000000",
-              "legendFormat": "{{ ifDescr }} - In",
-              "refId": "A"
-            },
-            {
-              "expr": "rate(ifHCOutOctets[5m]) * 8 / 1000000",
-              "legendFormat": "{{ ifDescr }} - Out",
-              "refId": "B"
-            }
-          ],
-          "yaxes": [
-            {"format": "Mbits", "min": 0},
-            {"format": "short"}
-          ]
+          "expr": "count(up{job=\"kubernetes-nodes\"})",
+          "legendFormat": "Total Nodes",
+          "refId": "A"
         }
       ],
-      "refresh": "30s",
-      "time": {"from": "now-6h", "to": "now"}
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "red"},
+              {"value": 1, "color": "yellow"},
+              {"value": 2, "color": "green"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Total Pods Running",
+      "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "targets": [
+        {
+          "expr": "count(kube_pod_info)",
+          "legendFormat": "Running Pods",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "red"},
+              {"value": 10, "color": "green"}
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Cluster CPU Usage",
+      "type": "gauge",
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "targets": [
+        {
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))) * 100",
+          "legendFormat": "CPU %",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 70, "color": "yellow"},
+              {"value": 90, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Cluster Memory Usage",
+      "type": "gauge",
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "Memory %",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 80, "color": "yellow"},
+              {"value": 95, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Node CPU Usage by Node",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [
+        {
+          "expr": "(1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))) * 100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Node Memory Usage by Node",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Top Pods by CPU",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
+      "targets": [
+        {
+          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{pod!=\"\"}[5m])))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "Value": "CPU (cores)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Top Pods by Memory",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
+      "targets": [
+        {
+          "expr": "topk(10, sum by (namespace, pod) (container_memory_working_set_bytes{pod!=\"\"}))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "Value": "Memory"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
     }
+  ]
+}
+
+  
+  network-traffic.json: |
+    {
+  "title": "Network Traffic Overview",
+  "tags": ["network", "traffic", "bandwidth"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Network Traffic (All Nodes)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])) * 8 / 1000000",
+          "legendFormat": "Download (Mbps)",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])) * 8 / 1000000",
+          "legendFormat": "Upload (Mbps)",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Mbits",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity"
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Network Traffic by Node",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])) * 8 / 1000000",
+          "legendFormat": "{{instance}} RX",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (instance) (rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])) * 8 / 1000000",
+          "legendFormat": "{{instance}} TX",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Mbits",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Network Traffic by Interface",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m]) * 8 / 1000000",
+          "legendFormat": "{{instance}}/{{device}} RX",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m]) * 8 / 1000000",
+          "legendFormat": "{{instance}}/{{device}} TX",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Mbits",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Packet Drop Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_drop_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])",
+          "legendFormat": "{{instance}}/{{device}} RX Drops",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_network_transmit_drop_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])",
+          "legendFormat": "{{instance}}/{{device}} TX Drops",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "custom": {
+            "lineWidth": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Network Errors",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_errs_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])",
+          "legendFormat": "{{instance}}/{{device}} RX Errors",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_network_transmit_errs_total{device!~\"lo|veth.*|cali.*|docker.*\"}[5m])",
+          "legendFormat": "{{instance}}/{{device}} TX Errors",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "custom": {
+            "lineWidth": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Total Data Transferred (24h)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 12, "x": 0, "y": 24},
+      "targets": [
+        {
+          "expr": "sum(increase(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[24h]))",
+          "legendFormat": "Downloaded",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Total Data Sent (24h)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 12, "x": 12, "y": 24},
+      "targets": [
+        {
+          "expr": "sum(increase(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*|docker.*\"}[24h]))",
+          "legendFormat": "Uploaded",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    }
+  ]
+}
+
