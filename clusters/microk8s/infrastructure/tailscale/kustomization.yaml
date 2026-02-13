@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - rbac.yaml
+  - tailscale-sealed-secret.yaml
   - deployment.yaml
-  # Uncomment after creating sealed secret with real auth key
-  # - tailscale-sealed-secret.yaml
