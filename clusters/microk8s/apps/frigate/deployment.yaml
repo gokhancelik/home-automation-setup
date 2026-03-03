@@ -79,7 +79,7 @@ spec:
               mountPath: /config-template
       containers:
         - name: frigate
-          image: ghcr.io/blakeblackshear/frigate:0.14.1
+          image: ghcr.io/blakeblackshear/frigate:0.16.4
           ports:
             - containerPort: 5000
               name: http
@@ -105,6 +105,10 @@ spec:
               mountPath: /media/frigate
             - name: shm
               mountPath: /dev/shm
+            - name: dri
+              mountPath: /dev/dri
+          securityContext:
+            privileged: true
           resources:
             requests:
               cpu: 1000m
@@ -142,6 +146,10 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 1Gi
+        - name: dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
 ---
 apiVersion: v1
 kind: Service

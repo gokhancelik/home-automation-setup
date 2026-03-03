@@ -15,15 +15,26 @@ data:
       password: "{FRIGATE_MQTT_PASSWORD}"
       topic_prefix: frigate
 
-    # CPU-based detection (no Coral TPU)
+    # OpenVINO detection with Intel GPU acceleration
     detectors:
-      cpu:
-        type: cpu
+      ov:
+        type: openvino
+        device: GPU
         num_threads: 2
 
     # Database for event metadata
     database:
       path: /config/frigate.db
+
+    # Model configuration - YOLOv9 for OpenVINO
+    model:
+      model_type: yolo-generic
+      width: 320
+      height: 320
+      input_tensor: nchw
+      input_dtype: float
+      path: https://github.com/blakeblackshear/frigate/releases/download/v0.16.0/yolov9s-320x320.onnx
+      labelmap_path: /labelmap/coco-80.txt
 
     # Recording and snapshot storage
     record:
@@ -56,6 +67,10 @@ data:
         package:
           min_score: 0.5
           threshold: 0.7
+
+    # FFmpeg hardware acceleration settings
+    ffmpeg:
+      hwaccel_args: preset-vaapi
 
     # Camera configuration
     cameras:
