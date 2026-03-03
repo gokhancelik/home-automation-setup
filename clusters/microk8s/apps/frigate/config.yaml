@@ -20,21 +20,20 @@ data:
       ov:
         type: openvino
         device: GPU
-        num_threads: 2
 
     # Database for event metadata
     database:
       path: /config/frigate.db
 
-    # Model configuration - YOLOv9 for OpenVINO
+    # Model configuration - Using default SSDLite MobileNet v2
+    # This is pre-installed and optimized for OpenVINO
     model:
-      model_type: yolo-generic
-      width: 320
-      height: 320
-      input_tensor: nchw
-      input_dtype: float
-      path: https://github.com/blakeblackshear/frigate/releases/download/v0.16.0/yolov9s-320x320.onnx
-      labelmap_path: /labelmap/coco-80.txt
+      width: 300
+      height: 300
+      input_tensor: nhwc
+      input_pixel_format: bgr
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+      labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
     # Recording and snapshot storage
     record:
