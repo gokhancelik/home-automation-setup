@@ -59,13 +59,21 @@ data:
         - dog
         - cat
         - car  # Re-added - stationary tracking prevents continuous recording
+        - face  # Face detection enabled
       filters:
         person:
           min_score: 0.5
           threshold: 0.7
+          # Focus on face region for better person tracking
+          mask:
         package:
           min_score: 0.5
           threshold: 0.7
+        face:
+          min_score: 0.6  # Higher threshold for face to reduce false positives
+          threshold: 0.75
+          min_area: 500  # Minimum face size in pixels (small faces filtered out)
+          max_area: 100000  # Maximum face size
 
     # FFmpeg hardware acceleration settings
     ffmpeg:
@@ -94,14 +102,23 @@ data:
             - dog
             - cat
             - car  # Re-added - Frigate's stationary tracking handles parked cars
+            - face  # Track faces on doorbell camera
+          filters:
+            face:
+              min_score: 0.6
+              threshold: 0.75
         zones:
           front_porch:
             coordinates: 0,480,640,480,640,200,0,200
+            objects:
+              - person
+              - face  # Face detection in front porch zone
         review:
           alerts:
             labels:
               - person
               - package
+              - face  # Alert on face detection
           detections:
             labels:
               - dog
@@ -127,10 +144,16 @@ data:
             - person
             - dog
             - cat
+            - face  # Track faces in backyard too
+          filters:
+            face:
+              min_score: 0.6
+              threshold: 0.75
         review:
           alerts:
             labels:
               - person
+              - face  # Alert on face detection in backyard
           detections:
             labels:
               - dog
