@@ -7,3 +7,4 @@ resources:
   - zigbee/
   - frigate/
   - test-web/
+  - factory-lens/

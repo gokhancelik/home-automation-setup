@@ -1,0 +1,21 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: factory-lens
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./k8s
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: factory-lens
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: factory-lens-api
+      namespace: factory-lens
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: factory-lens-frontend
+      namespace: factory-lens

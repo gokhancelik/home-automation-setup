@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: factory-lens-frontend
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: factory-lens-frontend
+  filterTags:
+    pattern: '^sha-[a-f0-9]+'
+    extract: '$0'
+  policy:
+    alphabetical:
+      order: asc

@@ -1,0 +1,29 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: factory-lens
+  namespace: flux-system
+spec:
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: factory-lens
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: |
+        chore(flux): update factory-lens image tags
+
+        {{range .Updated.Images -}}
+        - {{.}} 
+        {{end -}}
+    push:
+      branch: main
+  update:
+    path: ./k8s
+    strategy: Setters

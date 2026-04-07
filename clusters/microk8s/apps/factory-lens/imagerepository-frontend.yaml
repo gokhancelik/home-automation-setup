@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: factory-lens-frontend
+  namespace: flux-system
+spec:
+  image: ghcr.io/gokhancelik/factory-lens-frontend
+  interval: 1m
+  secretRef:
+    name: flux-system
