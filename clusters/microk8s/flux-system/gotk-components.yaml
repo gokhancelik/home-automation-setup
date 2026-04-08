@@ -14133,6 +14133,7 @@ spec:
           name: data
       nodeSelector:
         kubernetes.io/os: linux
+        kubernetes.io/hostname: ubuntu-desktop
       securityContext:
         fsGroup: 1337
       serviceAccountName: image-reflector-controller
@@ -14966,6 +14967,7 @@ spec:
           name: temp
       nodeSelector:
         kubernetes.io/os: linux
+        kubernetes.io/hostname: ubuntu-desktop
       securityContext:
         fsGroup: 1337
       serviceAccountName: image-automation-controller
