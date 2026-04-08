@@ -26,6 +26,11 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: pi-lab
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: pi-lab
+          effect: NoSchedule
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always

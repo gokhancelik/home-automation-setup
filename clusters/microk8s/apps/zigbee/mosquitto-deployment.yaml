@@ -21,6 +21,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         kubernetes.io/hostname: pi-lab
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: pi-lab
+          effect: NoSchedule
       initContainers:
       - name: setup-passwords
         image: eclipse-mosquitto:2.0.18
