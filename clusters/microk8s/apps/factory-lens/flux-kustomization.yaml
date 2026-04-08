@@ -9,7 +9,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: factory-lens
+    name: factory-lens-rw
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment

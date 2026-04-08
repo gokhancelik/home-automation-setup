@@ -7,4 +7,4 @@ spec:
   image: ghcr.io/gokhancelik/factory-lens-api
   interval: 1m
   secretRef:
-    name: flux-system
+    name: ghcr-flux-pull

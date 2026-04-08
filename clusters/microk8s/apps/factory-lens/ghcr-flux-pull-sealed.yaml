@@ -1,0 +1,20 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    sealedsecrets.bitnami.com/cluster-wide: "true"
+  creationTimestamp: null
+  name: ghcr-flux-pull
+  namespace: flux-system
+spec:
+  encryptedData:
+    .dockerconfigjson: AgConPD5poFFTijUEG10Iba4H3oWUyBYjuVY6GjbsAgV9Ponh143GT9Aj/f9Cm4JkLIrydp71FP+6zxJXyIbnsw/G3whXVgmldLYy5IuLVLaK11CEpkKkUCAmH5/fFhfj+Thfx1XaYNVIKluNFYBtsysZpeZ3mX8Hs74bi19UXauWYMDSJEeOLCR2GHHY1m73o9pNfHjrcBmMyEKh9C4TBE0ul4V1n4ybY3lyGXGtg3LDuVvU0gOFPZk3o/H1njZ02bxujLkMXce6f0UyarFBP/RcMlqEut4ODZW5j0b/VvKj3EDCS6mCCgp6Yvo6rvl5FeBMK/cj6lnOlgmDq8afdzgjFGeD7NRxhn9np51tlDHXmWbJc7Zi3z3f9Dm66pOFGHGpCkuizYOtnaSFhbdipqZdpg7jru0CK4SMkMPTTP7ISrKgwIeSqckTURuXwHHQGGndgdej4cpD92krMbce2X7ZdLs3bGSqsgGTq9gPJF8vI9D6hx9MnVAfvcjzFrZiPna5yN5wwUquF6HW2ItdtBz8uGW7sTR8rjOcrsdUaOVOEO67FDZoB05wzJgOrmRQ8eSeR0181QuIPyejcayufiyUDYHxhTfNphjt62cy9DiycwpSqJANOl1xSRx+GuFQm1D0SVszVHKA5IJqwhrm4YzYHaEQZqLE+6trtrpWNZpWtRaayo+lg6PS3rVDA4rw4Bup9Hl8CkWCqgHTEJ6xDIvqv6y8JSzf9EZMzeMkFvLnPG8FhxShlL8OqlLcrNmSrdAZqOrSkPw4yoxutfFpfcDdBpVEBZhgi45lVHAlCgkFVfEYpgqj3a+uF2+YVVG419AzSiswCI3AEVhQZAA9zeROGDRWspItFeS29bd4m90AAz+v//3KrwfQ3ZPkLfbf75SrzdLqWbwuSRexxg8f6mtMjzKOIEs5BqWWjsmgwFR9RNSCrQOQEp1
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: "true"
+      creationTimestamp: null
+      name: ghcr-flux-pull
+      namespace: flux-system
+    type: kubernetes.io/dockerconfigjson
