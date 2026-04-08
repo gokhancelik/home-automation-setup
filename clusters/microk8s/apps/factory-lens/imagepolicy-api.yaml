@@ -7,8 +7,8 @@ spec:
   imageRepositoryRef:
     name: factory-lens-api
   filterTags:
-    pattern: '^sha-[a-f0-9]+'
+    pattern: '^v\d+\.\d+\.\d+$'
     extract: '$0'
   policy:
-    alphabetical:
-      order: asc
+    semver:
+      range: '>=0.0.0'
