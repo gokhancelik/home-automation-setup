@@ -1,10 +1,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: factory-lens
+  name: factory-lens-rw
   namespace: flux-system
 spec:
   interval: 1m
   url: https://github.com/gokhancelik/factory-lens.git
   ref:
     branch: main
+  secretRef:
+    name: factory-lens-github-token

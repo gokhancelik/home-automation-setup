@@ -1,0 +1,20 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    sealedsecrets.bitnami.com/cluster-wide: "true"
+  creationTimestamp: null
+  name: factory-lens-github-token
+  namespace: flux-system
+spec:
+  encryptedData:
+    password: AgC5iCJX1Z5u0bxZyFogw1thNEdKYz8G2SM05FpkN+rRm3UkQoOMYDJY2zjoLF7J7n7/wCfC8fUldVrDaBGmseegGVBT3LD8CKuAV4sG+Gpyf/DMet87nkhRIi9PPjYMcU8uHkTXg4ckEoSz/WoPFCQKh+sCIzP7UVSUvqwofXyvJ8VMqM+TZZsEjzCgsRZX6i1MtnVqIGlrWxtkV0MNEk7uld0Bonp/IfR6ygVTHuJrgcVMg+9n0P1iBV1O6+RVXKiATK+N/YcvV7vjZR+yCA3FHgyaNfeCaZ5b4yL94L0rmHY97gtr5f2lnLWnFtNAmb0jym8BAqnbOIA0LG7dPSQJvolBakW1cwswPet1oNKEtMxSKn8/NoGHyn81MCfkh06E+33CV2iAuTNyJD2OuFa4GcslMRpjQeHb8bGzHmBD7gASx+lZpucwqMkp5ppH/lnonF8XNb3BoCClViupLN8iDUzDUoAc52FCad0zWV8JE39RTECHizzz62YQUaDNjV96byEc+ue6L6IyafRTohlfn5jiweVzGX4gymLguJoiQtvY+3ctGPLwpeHjKNlsCxH2Rhq2q4nje8Jz30FgStriWqTFQjIa/6g5+IBfs+HJXzPeUeWuG+G+ZLGhYMZZsP19ytqOH2kAUhjxtkS87b9cDQI/yjk1fQoSAqJRKQwoKRNBHWWoBDbwKEWguqvmY8gCYUBx21B8MweuuAnxLawgFPf+TAV6QopOlG4fiwdOewGJr46DOu1m
+    username: AgCYRKQ0lUpgeFJavQXOznlPBZK9agG4fiHTZsOYZyV4qCEPZWhQ9kMHgbcTMxCIHcu+i3n3cJbXTVZ1Ysf04+ZD58MeukYALyTpmQon049ccN5YBdc7HHz1BZNDsYyXLyRb6JIix2C+EK6eo0cYbypEcfzyWgea1nj6n5navKSfqhnaQjBiBspcMJfJO9mjItci9RkQ+6FLzy0cqBaYPE00f+gOytn2T8/xZPmjaVjPbNXcjyKV+G0wReVd4kfLKID77xdtfs+5mis5+03qLN6aeeM92RiTWOT20opQu40okuFshfNiDYRKUa0sBKA4gJ++//ksgH9mCzKqCdo9g73JxTCfPeMcIEtSXMfQa54wZH8e1jfVM1Yfp0GDiQfyLoej6QEvsEZqfQQP9tadE+Rpv1FnbYPYcfLt57Lw9Pfrd4V3XSV+XZJmh8CSgEHPajzeCXEdViatMuaLw05RgZ0yWeUu9uXg8p0BmKzOoVQy8jJgoZmW9AUPPkbZt5auI72YuzB1m6oFhw/dCHKbIqSJVh2d0bqmu2LaGetld1P//SCL7mFcJe2hcejo3ZCiII2Y03ef3gvOJPglyFOd4N/Kl3CYzTScp6W+YnpOfRwF12FGivNP88OAjVCh7T50VGn/U47s6GV8lv+b5qttLh0dRtNbu1KYKxEvTRwH7wBzTA1bhzHYNKPeBCJbmfCubgWgPBPBfYE9AgcL/A==
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: "true"
+      creationTimestamp: null
+      name: factory-lens-github-token
+      namespace: flux-system
