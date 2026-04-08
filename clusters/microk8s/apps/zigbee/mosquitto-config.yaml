@@ -63,6 +63,10 @@ data:
     user frigate
     topic readwrite frigate/#
     topic readwrite homeassistant/#
+
+    # Factory Lens industrial observability
+    user factory-lens
+    topic readwrite factory/#
   
   password_file: |
     # Placeholder - will be replaced by init container
