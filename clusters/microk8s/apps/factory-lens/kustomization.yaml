@@ -7,6 +7,8 @@ resources:
   - flux-kustomization.yaml
   - imagerepository-api.yaml
   - imagerepository-frontend.yaml
+  - imagerepository-simulator.yaml
   - imagepolicy-api.yaml
   - imagepolicy-frontend.yaml
+  - imagepolicy-simulator.yaml
   - imageupdateautomation.yaml

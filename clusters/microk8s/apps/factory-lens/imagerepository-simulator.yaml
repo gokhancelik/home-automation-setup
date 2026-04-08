@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageRepository
+metadata:
+  name: factory-lens-simulator
+  namespace: flux-system
+spec:
+  image: ghcr.io/gokhancelik/factory-lens-simulator
+  interval: 1m
+  secretRef:
+    name: ghcr-flux-pull

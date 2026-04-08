@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  name: factory-lens-simulator
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: factory-lens-simulator
+  filterTags:
+    pattern: '^v\d+\.\d+\.\d+$'
+    extract: '$0'
+  policy:
+    semver:
+      range: '>=0.0.0'
