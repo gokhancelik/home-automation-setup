@@ -5,6 +5,7 @@ metadata:
   namespace: home-automation
 spec:
   interval: 5m
+  timeout: 15m
   chart:
     spec:
       chart: ./charts/home-assistant
@@ -12,7 +13,7 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-      version: 1.3.16
+      version: 1.3.17
       interval: 5m
   values:
     tolerations:
