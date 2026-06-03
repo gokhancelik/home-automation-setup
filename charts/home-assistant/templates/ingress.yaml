@@ -16,10 +16,19 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
-    # Buffering settings to improve performance for large static files
-    nginx.ingress.kubernetes.io/proxy-buffering: "on"
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
-    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    # Buffering disabled to stream responses immediately and avoid delays
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    # Cache static assets to avoid re-fetching hundreds of JS chunks (HA 2026.6+ issue)
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        proxy_cache static-cache;
+        proxy_cache_valid 200 60m;
+        proxy_cache_bypass $http_cache_control;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_lock on;
+        proxy_cache_background_update on;
+        add_header X-Cache-Status $upstream_cache_status;
+      }
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- if .Values.ingress.tls.enabled }}
