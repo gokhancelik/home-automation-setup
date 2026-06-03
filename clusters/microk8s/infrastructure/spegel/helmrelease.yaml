@@ -1,0 +1,36 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: spegel
+  namespace: spegel
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: spegel
+      version: v0.7.1
+      sourceRef:
+        kind: HelmRepository
+        name: spegel
+        namespace: flux-system
+      interval: 15m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    spegel:
+      # microk8s containerd paths — defaults assume /run/containerd
+      # and /etc/containerd which don't exist in snap-packaged microk8s.
+      containerdSock: "/var/snap/microk8s/common/run/containerd.sock"
+      containerdRegistryConfigPath: "/var/snap/microk8s/current/args/certs.d"
+      containerdContentPath: "/var/snap/microk8s/common/var/lib/containerd/io.containerd.content.v1.content"
+      mirroredRegistries:
+        - https://registry-1.docker.io
+        - https://ghcr.io
+        - https://quay.io
+        - https://gcr.io
+        - https://registry.k8s.io
