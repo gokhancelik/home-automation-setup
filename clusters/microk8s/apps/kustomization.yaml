@@ -8,3 +8,4 @@ resources:
   - frigate/
   - test-web/
   - factory-lens/
+  - portainer/

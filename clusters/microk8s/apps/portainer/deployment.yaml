@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: portainer
+  labels:
+    app: portainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      containers:
+      - name: portainer
+        image: portainer/portainer-ce:2.21.4
+        ports:
+        - name: http
+          containerPort: 9000
+          protocol: TCP
+        - name: https
+          containerPort: 9443
+          protocol: TCP
+        - name: edge
+          containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        env:
+        - name: EDGE_ID
+          value: "pi-lab-docker"
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: portainer-data
