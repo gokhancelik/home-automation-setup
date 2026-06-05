@@ -31,11 +31,13 @@ spec:
           https: 30443
       extraArgs:
         enable-ssl-chain-completion: "true"
+      allowSnippetAnnotations: true
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
         use-proxy-protocol: "false"
         ssl-protocols: "TLSv1.2 TLSv1.3"
+        allow-snippet-annotations: "true"
       metrics:
         enabled: false
       admissionWebhooks:
