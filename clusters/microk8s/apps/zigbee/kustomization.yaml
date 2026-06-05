@@ -7,5 +7,6 @@ resources:
   - mosquitto-deployment.yaml
   - zigbee2mqtt-config.yaml
   - zigbee2mqtt-deployment.yaml
+  - external-service.yaml
   - ingress.yaml
   - sealed-secrets.yaml
