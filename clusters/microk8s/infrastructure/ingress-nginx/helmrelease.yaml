@@ -37,7 +37,6 @@ spec:
         compute-full-forwarded-for: "true"
         use-proxy-protocol: "false"
         ssl-protocols: "TLSv1.2 TLSv1.3"
-        allow-snippet-annotations: "true"
       metrics:
         enabled: false
       admissionWebhooks:
