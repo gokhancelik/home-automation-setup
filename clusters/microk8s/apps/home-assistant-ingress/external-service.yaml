@@ -1,0 +1,38 @@
+# Routes ha.gcelik.dev (terminated by nginx-ingress + cert-manager) to the
+# Home Assistant container running under Docker on pi-lab (192.168.2.59:8123).
+# Headless Service with no selector, bound to a manually-managed EndpointSlice.
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant
+  namespace: home-automation
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: http
+    appProtocol: http
+    port: 8123
+    targetPort: 8123
+    protocol: TCP
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: home-assistant
+  namespace: home-automation
+  labels:
+    kubernetes.io/service-name: home-assistant
+addressType: IPv4
+ports:
+- name: http
+  appProtocol: http
+  port: 8123
+  protocol: TCP
+endpoints:
+- addresses:
+  - "192.168.2.59"
+  conditions:
+    ready: true
+    serving: true
+    terminating: false
