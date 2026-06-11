@@ -17,15 +17,12 @@ spec:
       labels:
         app: mosquitto
     spec:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      # Runs on ubuntu-desktop as a normal ClusterIP-backed pod. pi-lab was
+      # detached from the cluster; the Docker Mosquitto on pi-lab serves the
+      # Docker stack (HA + Zigbee2MQTT) independently. This broker serves the
+      # in-cluster clients (Frigate, factory-lens) via mosquitto.zigbee.svc.
       nodeSelector:
-        kubernetes.io/hostname: pi-lab
-      tolerations:
-        - key: dedicated
-          operator: Equal
-          value: pi-lab
-          effect: NoSchedule
+        kubernetes.io/hostname: ubuntu-desktop
       initContainers:
       - name: setup-passwords
         image: eclipse-mosquitto:2.0.18
