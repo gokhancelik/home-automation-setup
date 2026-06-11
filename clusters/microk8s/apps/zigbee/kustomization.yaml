@@ -2,11 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  - pvc.yaml
-  - mosquitto-config.yaml
-  - mosquitto-deployment.yaml
-  - zigbee2mqtt-config.yaml
-  - zigbee2mqtt-deployment.yaml
+  # Mosquitto + Zigbee2MQTT migrated to Docker on pi-lab (192.168.2.59).
+  # The K8s Deployments below were removed because they fought the Docker
+  # containers for host port 1883 and the /dev/ttyUSB0 coordinator,
+  # causing CrashLoopBackOff and intermittent sensor dropouts.
+  # - pvc.yaml
+  # - mosquitto-config.yaml
+  # - mosquitto-deployment.yaml
+  # - zigbee2mqtt-config.yaml
+  # - zigbee2mqtt-deployment.yaml
   - external-service.yaml
   - ingress.yaml
   - sealed-secrets.yaml
