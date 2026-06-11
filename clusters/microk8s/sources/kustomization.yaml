@@ -10,4 +10,3 @@ resources:
   - grafana.yaml
   - influxdata.yaml
   - nfs-provisioner.yaml
-  - spegel.yaml
