@@ -4,7 +4,7 @@ resources:
   - namespace.yaml
   # - home-assistant/
   # - matter-server/
-  # - zigbee/
+  - zigbee/
   - frigate/
   - test-web/
   - factory-lens/
