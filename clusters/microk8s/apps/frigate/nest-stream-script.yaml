@@ -32,7 +32,7 @@ data:
     access_token = token_response.json()["access_token"]
     
     # Get camera stream
-    api_url = f"https://smartdevicemanagement.googleapis.com/v1/{device_id}"
+    api_url = f"https://smartdevicemanagement.googleapis.com/v1/enterprises/{project_id}/devices/{device_id}"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
