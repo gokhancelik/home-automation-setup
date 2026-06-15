@@ -41,6 +41,13 @@ spec:
               # Inject backyard camera credentials
               sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
               sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
+
+              # Inject Nest credentials for go2rtc (use | delimiter to avoid issues with special chars)
+              sed -i "s|{NEST_PROJECT_ID}|$NEST_PROJECT_ID|g" /config/config.yml
+              sed -i "s|{NEST_CLIENT_ID}|$NEST_CLIENT_ID|g" /config/config.yml
+              sed -i "s|{NEST_CLIENT_SECRET}|$NEST_CLIENT_SECRET|g" /config/config.yml
+              sed -i "s|{NEST_REFRESH_TOKEN}|$NEST_REFRESH_TOKEN|g" /config/config.yml
+              sed -i "s|{NEST_DEVICE_ID}|$NEST_DEVICE_ID|g" /config/config.yml
           env:
             - name: MQTT_USER
               valueFrom:
@@ -72,6 +79,31 @@ spec:
                 secretKeyRef:
                   name: frigate-credentials
                   key: backyard-password
+            - name: NEST_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-project-id
+            - name: NEST_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-client-id
+            - name: NEST_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-client-secret
+            - name: NEST_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-refresh-token
+            - name: NEST_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-device-id
           volumeMounts:
             - name: config
               mountPath: /config
@@ -79,7 +111,7 @@ spec:
               mountPath: /config-template
       containers:
         - name: frigate
-          image: ghcr.io/blakeblackshear/frigate:0.16.4
+          image: ghcr.io/blakeblackshear/frigate:0.17.1
           ports:
             - containerPort: 5000
               name: http
@@ -93,6 +125,8 @@ spec:
           env:
             - name: TZ
               value: "Europe/Amsterdam"
+            - name: GO2RTC_ALLOW_ARBITRARY_EXEC
+              value: "true"
             - name: PLUS_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -107,6 +141,9 @@ spec:
               mountPath: /dev/shm
             - name: dri
               mountPath: /dev/dri
+            - name: nest-script
+              mountPath: /usr/local/bin/nest_stream.py
+              subPath: nest_stream.py
           securityContext:
             privileged: true
           resources:
@@ -150,6 +187,10 @@ spec:
           hostPath:
             path: /dev/dri
             type: Directory
+        - name: nest-script
+          configMap:
+            name: nest-stream-script
+            defaultMode: 0755
 ---
 apiVersion: v1
 kind: Service
@@ -159,19 +200,22 @@ metadata:
   labels:
     app: frigate
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 5000
       targetPort: http
       protocol: TCP
       name: http
+      nodePort: 30500
     - port: 8554
       targetPort: rtsp
       protocol: TCP
       name: rtsp
+      nodePort: 30554
     - port: 8555
       targetPort: webrtc-tcp
       protocol: TCP
       name: webrtc-tcp
+      nodePort: 30555
   selector:
     app: frigate

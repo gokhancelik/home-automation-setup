@@ -15,6 +15,12 @@ data:
       password: "{FRIGATE_MQTT_PASSWORD}"
       topic_prefix: frigate
 
+    # go2rtc configuration for WebRTC and Nest camera support  
+    go2rtc:
+      streams:
+        nest_back_garden:
+          - "ffmpeg:http://home-assistant.home-assistant.svc.cluster.local:8123/api/camera_proxy_stream/camera.back_garden_camera#video=copy#audio=copy"
+
     # OpenVINO detection with Intel GPU acceleration
     detectors:
       ov:
@@ -158,3 +164,42 @@ data:
             labels:
               - dog
               - cat
+
+      nest_camera:
+        enabled: true
+        ffmpeg:
+          inputs:
+            - path: rtsp://127.0.0.1:8554/nest_back_garden
+              roles:
+                - detect
+            - path: rtsp://127.0.0.1:8554/nest_back_garden
+              roles:
+                - record
+        detect:
+          width: 1920
+          height: 1080
+          fps: 5
+        objects:
+          track:
+            - person
+            - dog
+            - cat
+            - car
+            - face
+          filters:
+            person:
+              min_score: 0.5
+              threshold: 0.7
+            face:
+              min_score: 0.6
+              threshold: 0.75
+        review:
+          alerts:
+            labels:
+              - person
+              - face
+          detections:
+            labels:
+              - dog
+              - cat
+              - car
