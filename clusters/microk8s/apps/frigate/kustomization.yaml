@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - pvc.yaml
   - config.yaml
+  - nest-stream-script.yaml
   - sealed-secrets.yaml
   - deployment.yaml
   - ingress.yaml
