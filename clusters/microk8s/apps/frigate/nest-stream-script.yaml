@@ -7,9 +7,8 @@ data:
   nest_stream.py: |
     #!/usr/bin/env python3
     import sys
-    import json
+    import time
     import requests
-    from datetime import datetime, timedelta
 
     # Get arguments
     device_id = sys.argv[1]
@@ -40,7 +39,8 @@ data:
     
     # Execute GenerateRtspStream command
     stream_data = {
-        "command": "sdm.devices.commands.CameraLiveStream.GenerateRtspStream"
+        "command": "sdm.devices.commands.CameraLiveStream.GenerateRtspStream",
+        "params": {}
     }
     
     stream_response = requests.post(
@@ -48,6 +48,9 @@ data:
         headers=headers,
         json=stream_data
     )
+    if stream_response.status_code == 429:
+        time.sleep(30)
+        sys.exit(1)
     stream_response.raise_for_status()
     
     result = stream_response.json()["results"]
