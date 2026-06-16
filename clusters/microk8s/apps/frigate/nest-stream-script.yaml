@@ -18,8 +18,9 @@ data:
     # inside the HA container and can't be reached from this pod.
     url = f"http://192.168.2.59:8123/api/camera_proxy_stream/{entity_id}"
 
-    os.execvp('ffmpeg', [
-        'ffmpeg', '-hide_banner', '-loglevel', 'error',
+    ffmpeg = '/usr/lib/ffmpeg/7.0/bin/ffmpeg'
+    os.execvp(ffmpeg, [
+        ffmpeg, '-hide_banner', '-loglevel', 'error',
         '-headers', f'Authorization: Bearer {ha_token}\r\n',
         '-i', url,
         '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
