@@ -8,58 +8,20 @@ data:
     #!/usr/bin/env python3
     import os
     import sys
-    import time
-    import requests
 
     # Get arguments
-    device_id = sys.argv[1]
-    project_id = sys.argv[2]
-    client_id = sys.argv[3]
-    client_secret = sys.argv[4]
-    refresh_token = sys.argv[5]
+    entity_id = sys.argv[1]
+    ha_token = sys.argv[2]
 
-    # Refresh access token
-    token_url = "https://oauth2.googleapis.com/token"
-    token_data = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "refresh_token": refresh_token,
-        "grant_type": "refresh_token"
-    }
-    
-    token_response = requests.post(token_url, data=token_data)
-    token_response.raise_for_status()
-    access_token = token_response.json()["access_token"]
-    
-    # Get camera stream
-    api_url = f"https://smartdevicemanagement.googleapis.com/v1/enterprises/{project_id}/devices/{device_id}"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
-    
-    # Execute GenerateRtspStream command
-    stream_data = {
-        "command": "sdm.devices.commands.CameraLiveStream.GenerateRtspStream",
-        "params": {}
-    }
-    
-    stream_response = requests.post(
-        f"{api_url}:executeCommand",
-        headers=headers,
-        json=stream_data
-    )
-    if stream_response.status_code == 429:
-        time.sleep(30)
-        sys.exit(1)
-    stream_response.raise_for_status()
-    
-    result = stream_response.json()["results"]
-    stream_url = result["streamUrls"]["rtspUrl"]
-    
-    # Pipe the stream as MPEG-TS to stdout for go2rtc exec source
+    # HA's camera_proxy_stream bridges WebRTC-only Nest cameras to a plain
+    # HTTP stream server-side, since go2rtc itself is locked to 127.0.0.1
+    # inside the HA container and can't be reached from this pod.
+    url = f"http://192.168.2.59:8123/api/camera_proxy_stream/{entity_id}"
+
     os.execvp('ffmpeg', [
         'ffmpeg', '-hide_banner', '-loglevel', 'error',
-        '-re', '-i', stream_url,
-        '-c', 'copy', '-f', 'mpegts', 'pipe:1'
+        '-headers', f'Authorization: Bearer {ha_token}\r\n',
+        '-i', url,
+        '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+        '-f', 'mpegts', 'pipe:1'
     ])

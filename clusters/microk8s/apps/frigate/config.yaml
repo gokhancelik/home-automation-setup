@@ -15,12 +15,12 @@ data:
       password: "{FRIGATE_MQTT_PASSWORD}"
       topic_prefix: frigate
 
-    # go2rtc configuration — consume Nest stream from HA's embedded go2rtc (WebRTC→RTSP proxy)
-    # HA go2rtc RTSP is exposed on 0.0.0.0:18554 via go2rtc.yaml in HA config dir
+    # go2rtc configuration — pull Nest stream via HA's authenticated camera_proxy_stream
+    # API (HA's own go2rtc is hardcoded to 127.0.0.1, unreachable from this pod)
     go2rtc:
       streams:
         nest_back_garden:
-          - "rtsp://192.168.2.59:18554/camera.back_garden_camera"
+          - "exec:python3 /usr/local/bin/nest_stream.py camera.back_garden_camera {HA_TOKEN}"
 
     # OpenVINO detection with Intel GPU acceleration
     detectors:
