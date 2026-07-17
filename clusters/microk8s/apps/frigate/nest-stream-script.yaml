@@ -9,13 +9,10 @@ data:
     import os
     import sys
 
-    # Get arguments
+    # Read HA token from environment (set in frigate container env)
+    ha_token = os.environ['HA_TOKEN']
     entity_id = sys.argv[1]
-    ha_token = sys.argv[2]
 
-    # HA's camera_proxy_stream bridges WebRTC-only Nest cameras to a plain
-    # HTTP stream server-side, since go2rtc itself is locked to 127.0.0.1
-    # inside the HA container and can't be reached from this pod.
     url = f"http://192.168.2.59:8123/api/camera_proxy_stream/{entity_id}"
 
     ffmpeg = '/usr/lib/ffmpeg/7.0/bin/ffmpeg'

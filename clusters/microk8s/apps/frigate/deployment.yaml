@@ -43,8 +43,6 @@ spec:
                 sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
                 sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
 
-                # Inject HA long-lived access token for Nest camera_proxy_stream
-                sed -i "s|{HA_TOKEN}|$HA_TOKEN|g" /config/config.yml
               fi
           env:
             - name: MQTT_USER
@@ -110,6 +108,11 @@ spec:
                 secretKeyRef:
                   name: frigate-credentials
                   key: plus-api-key
+            - name: HA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: ha-token
           volumeMounts:
             - name: config
               mountPath: /config

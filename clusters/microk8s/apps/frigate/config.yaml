@@ -20,7 +20,7 @@ data:
     go2rtc:
       streams:
         nest_back_garden:
-          - "exec:python3 /usr/local/bin/nest_stream.py camera.back_garden_camera {HA_TOKEN}"
+          - "exec:python3 /usr/local/bin/nest_stream.py camera.back_garden_camera"
 
     # OpenVINO detection with Intel GPU acceleration
     detectors:
