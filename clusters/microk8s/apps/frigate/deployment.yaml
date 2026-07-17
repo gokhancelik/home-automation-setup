@@ -27,23 +27,25 @@ spec:
             - /bin/sh
             - -c
             - |
-              # Copy config template to writable config volume
-              cp /config-template/config.yml /config/config.yml
+              # Only seed config on first run — preserve UI changes across restarts
+              if [ ! -f /config/config.yml ]; then
+                cp /config-template/config.yml /config/config.yml
 
-              # Inject MQTT credentials
-              sed -i "s/{FRIGATE_MQTT_USER}/$MQTT_USER/" /config/config.yml
-              sed -i "s/{FRIGATE_MQTT_PASSWORD}/$MQTT_PASSWORD/" /config/config.yml
+                # Inject MQTT credentials
+                sed -i "s/{FRIGATE_MQTT_USER}/$MQTT_USER/" /config/config.yml
+                sed -i "s/{FRIGATE_MQTT_PASSWORD}/$MQTT_PASSWORD/" /config/config.yml
 
-              # Inject doorbell camera credentials
-              sed -i "s/{DOORBELL_USER}/$DOORBELL_USER/g" /config/config.yml
-              sed -i "s/{DOORBELL_PASSWORD}/$DOORBELL_PASSWORD/g" /config/config.yml
+                # Inject doorbell camera credentials
+                sed -i "s/{DOORBELL_USER}/$DOORBELL_USER/g" /config/config.yml
+                sed -i "s/{DOORBELL_PASSWORD}/$DOORBELL_PASSWORD/g" /config/config.yml
 
-              # Inject backyard camera credentials
-              sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
-              sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
+                # Inject backyard camera credentials
+                sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
+                sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
 
-              # Inject HA long-lived access token for Nest camera_proxy_stream (use | delimiter to avoid issues with special chars)
-              sed -i "s|{HA_TOKEN}|$HA_TOKEN|g" /config/config.yml
+                # Inject HA long-lived access token for Nest camera_proxy_stream
+                sed -i "s|{HA_TOKEN}|$HA_TOKEN|g" /config/config.yml
+              fi
           env:
             - name: MQTT_USER
               valueFrom:

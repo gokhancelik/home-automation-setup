@@ -9,7 +9,7 @@ data:
     # https://docs.frigate.video/configuration/
 
     mqtt:
-      host: mosquitto.zigbee.svc.cluster.local
+      host: 192.168.2.59
       port: 1883
       user: "{FRIGATE_MQTT_USER}"
       password: "{FRIGATE_MQTT_PASSWORD}"
