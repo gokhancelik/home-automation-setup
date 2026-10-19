@@ -7,7 +7,8 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # LAN only: Paperclip orchestrates agents that can run code, so keep it off the internet.
-    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    # 88.159.77.246 is our own WAN address: LAN clients using the public hostname are hairpinned by the router and arrive from it.
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,88.159.77.246/32"
     # Live run updates use long-lived connections; keep them open.
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
