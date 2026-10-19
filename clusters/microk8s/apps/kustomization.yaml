@@ -10,3 +10,4 @@ resources:
   - test-web/
   - factory-lens/
   - portainer/
+  - paperclip-ingress/   # paperclip.gcelik.dev -> Paperclip on aibox (192.168.2.43:3100), LAN only

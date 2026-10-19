@@ -1,0 +1,38 @@
+# Routes paperclip.gcelik.dev (terminated by nginx-ingress + cert-manager) to
+# Paperclip running as a plain Node process on aibox (192.168.2.43:3100, bound with --bind lan).
+# Headless Service with no selector, bound to a manually-managed EndpointSlice.
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperclip
+  namespace: paperclip
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: http
+    appProtocol: http
+    port: 3100
+    targetPort: 3100
+    protocol: TCP
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: paperclip
+  namespace: paperclip
+  labels:
+    kubernetes.io/service-name: paperclip
+addressType: IPv4
+ports:
+- name: http
+  appProtocol: http
+  port: 3100
+  protocol: TCP
+endpoints:
+- addresses:
+  - "192.168.2.43"
+  conditions:
+    ready: true
+    serving: true
+    terminating: false
