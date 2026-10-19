@@ -6,20 +6,122 @@ metadata:
 data:
   nest_stream.py: |
     #!/usr/bin/env python3
+    """
+    Relay the HA camera_proxy_stream MJPEG feed to stdout.
+    Re-encodes each image frame via Pillow to produce standard-compliant
+    JPEGs that ffmpeg can decode (HA's Nest integration emits non-standard
+    Huffman tables that ffmpeg's MJPEG decoder rejects, and may also
+    send PNG placeholder frames).
+    """
+
     import os
     import sys
+    import re
+    import urllib.request
+    from io import BytesIO
 
-    # Read HA token from environment (set in frigate container env)
+    try:
+        from PIL import Image
+    except ImportError:
+        Image = None
+
     ha_token = os.environ['HA_TOKEN']
     entity_id = sys.argv[1]
-
     url = f"http://192.168.2.59:8123/api/camera_proxy_stream/{entity_id}"
 
-    ffmpeg = '/usr/lib/ffmpeg/7.0/bin/ffmpeg'
-    os.execvp(ffmpeg, [
-        ffmpeg, '-hide_banner', '-loglevel', 'error',
-        '-headers', f'Authorization: Bearer {ha_token}\r\n',
-        '-i', url,
-        '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
-        '-f', 'mpegts', 'pipe:1'
-    ])
+    sys.stderr.write(f"nest_stream: connecting to {entity_id}\n")
+    sys.stderr.flush()
+
+    sys.stdout.reconfigure(line_buffering=False)
+    out = sys.stdout.buffer
+
+    req = urllib.request.Request(url)
+    req.add_header('Authorization', f'Bearer {ha_token}')
+
+    resp = urllib.request.urlopen(req, timeout=None)
+    sys.stderr.write(f"nest_stream: connected, reading stream\n")
+    sys.stderr.flush()
+
+    buf = b''
+    boundary_re = re.compile(b'--(\S+?)(?:\r?\n|--)')
+    first = True
+    frame_count = 0
+
+    while True:
+        chunk = resp.read(65536)
+        if not chunk:
+            sys.stderr.write(f"nest_stream: connection closed ({frame_count} frames)\n")
+            sys.stderr.flush()
+            break
+        buf += chunk
+
+        while True:
+            if first and boundary_re.search(buf) is None:
+                break
+
+            if first:
+                m = boundary_re.search(buf)
+                if m is None:
+                    break
+                boundary = m.group(1)
+                first = False
+                idx = m.end()
+                header_end = buf.find(b'\r\n\r\n', idx)
+                if header_end == -1:
+                    header_end = buf.find(b'\n\n', idx)
+                if header_end != -1:
+                    idx = header_end + (4 if buf[header_end:header_end+4] == b'\r\n\r\n' else 2)
+                buf = buf[idx:]
+                sys.stderr.write(f"nest_stream: boundary={boundary.decode()}\n")
+                sys.stderr.flush()
+                continue
+
+            frame_end = buf.find(b'\r\n--' + boundary)
+            if frame_end == -1:
+                frame_end = buf.find(b'\n--' + boundary)
+            if frame_end == -1:
+                break
+
+            # Search for any image start marker (JPEG SOI or PNG signature)
+            # within the frame region before frame_end
+            img_start = -1
+            for marker in [b'\xff\xd8', b'\x89PNG']:
+                pos = buf.find(marker)
+                if pos != -1 and pos < frame_end:
+                    img_start = pos
+                    break
+
+            if img_start == -1:
+                # No image data found, skip this frame
+                frame_count += 1
+                if frame_count <= 3:
+                    sys.stderr.write(f"nest_stream: frame {frame_count} has no image data, skipping\n")
+                    sys.stderr.flush()
+                buf = buf[frame_end:]
+                continue
+
+            raw_data = buf[img_start:frame_end]
+            frame_count += 1
+
+            # Re-encode via Pillow to produce standard-compliant JPEG.
+            # Handles both JPEG and PNG inputs (Nest may send PNG placeholders).
+            if Image is not None:
+                try:
+                    img = Image.open(BytesIO(raw_data))
+                    new_buf = BytesIO()
+                    img.save(new_buf, format='JPEG', quality=85)
+                    raw_data = new_buf.getvalue()
+                    if frame_count <= 3:
+                        sys.stderr.write(f"nest_stream: frame {frame_count} re-encoded ({len(raw_data)} bytes)\n")
+                        sys.stderr.flush()
+                except Exception as e:
+                    if frame_count <= 3:
+                        sys.stderr.write(f"nest_stream: frame {frame_count} re-encode failed: {e}\n")
+                        sys.stderr.flush()
+
+            out.write(raw_data)
+            out.flush()
+
+            buf = buf[frame_end:]
+
+    resp.close()

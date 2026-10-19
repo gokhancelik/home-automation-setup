@@ -15,12 +15,11 @@ data:
       password: "{FRIGATE_MQTT_PASSWORD}"
       topic_prefix: frigate
 
-    # go2rtc configuration — pull Nest stream via HA's authenticated camera_proxy_stream
-    # API (HA's own go2rtc is hardcoded to 127.0.0.1, unreachable from this pod)
+    # go2rtc native Nest SDM API source — connects directly to Google's API
     go2rtc:
       streams:
         nest_back_garden:
-          - "exec:python3 /usr/local/bin/nest_stream.py camera.back_garden_camera"
+          - "nest:?client_id={NEST_CLIENT_ID}&client_secret={NEST_CLIENT_SECRET}&refresh_token={NEST_REFRESH_TOKEN}&project_id={NEST_PROJECT_ID}&device_id={NEST_DEVICE_ID}"
 
     # OpenVINO detection with Intel GPU acceleration
     detectors:
@@ -170,12 +169,20 @@ data:
         enabled: true
         ffmpeg:
           inputs:
+            # First consumer gets the empty H264 track (sacrificial)
             - path: rtsp://127.0.0.1:8554/nest_back_garden
-              roles:
-                - detect
-            - path: rtsp://127.0.0.1:8554/nest_back_garden
+              input_args:
+                - -rtsp_transport
+                - tcp
               roles:
                 - record
+            # Second consumer gets the working H264 track
+            - path: rtsp://127.0.0.1:8554/nest_back_garden
+              input_args:
+                - -rtsp_transport
+                - tcp
+              roles:
+                - detect
         detect:
           width: 1920
           height: 1080

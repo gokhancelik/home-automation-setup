@@ -43,7 +43,18 @@ spec:
                 sed -i "s/{BACKYARD_USER}/$BACKYARD_USER/g" /config/config.yml
                 sed -i "s/{BACKYARD_PASSWORD}/$BACKYARD_PASSWORD/g" /config/config.yml
 
+                # Inject Nest SDM API credentials for go2rtc native nest source
+                # Using # as sed delimiter because refresh_token contains /
+                sed -i "s#{NEST_CLIENT_ID}#$NEST_CLIENT_ID#" /config/config.yml
+                sed -i "s#{NEST_CLIENT_SECRET}#$NEST_CLIENT_SECRET#" /config/config.yml
+                sed -i "s#{NEST_REFRESH_TOKEN}#$NEST_REFRESH_TOKEN#" /config/config.yml
+                sed -i "s#{NEST_PROJECT_ID}#$NEST_PROJECT_ID#" /config/config.yml
+                sed -i "s#{NEST_DEVICE_ID}#$NEST_DEVICE_ID#" /config/config.yml
+
               fi
+
+              # Download newer go2rtc to fix dual-H264-track bug in v1.9.10
+              wget -q "https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_linux_amd64" -O /go2rtc-bin/go2rtc && chmod +x /go2rtc-bin/go2rtc || echo "go2rtc download failed, using embedded version"
           env:
             - name: MQTT_USER
               valueFrom:
@@ -80,11 +91,38 @@ spec:
                 secretKeyRef:
                   name: frigate-credentials
                   key: ha-token
+            - name: NEST_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-client-id
+            - name: NEST_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-client-secret
+            - name: NEST_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-refresh-token
+            - name: NEST_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-project-id
+            - name: NEST_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-credentials
+                  key: nest-device-id
           volumeMounts:
             - name: config
               mountPath: /config
             - name: config-template
               mountPath: /config-template
+            - name: go2rtc-bin
+              mountPath: /go2rtc-bin
       containers:
         - name: frigate
           image: ghcr.io/blakeblackshear/frigate:0.17.1
@@ -101,8 +139,6 @@ spec:
           env:
             - name: TZ
               value: "Europe/Amsterdam"
-            - name: GO2RTC_ALLOW_ARBITRARY_EXEC
-              value: "true"
             - name: PLUS_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -122,9 +158,8 @@ spec:
               mountPath: /dev/shm
             - name: dri
               mountPath: /dev/dri
-            - name: nest-script
-              mountPath: /usr/local/bin/nest_stream.py
-              subPath: nest_stream.py
+            - name: go2rtc-bin
+              mountPath: /usr/local/go2rtc/bin
           securityContext:
             privileged: true
           resources:
@@ -168,10 +203,8 @@ spec:
           hostPath:
             path: /dev/dri
             type: Directory
-        - name: nest-script
-          configMap:
-            name: nest-stream-script
-            defaultMode: 0755
+        - name: go2rtc-bin
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
