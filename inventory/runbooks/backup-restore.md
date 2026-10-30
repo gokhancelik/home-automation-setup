@@ -12,9 +12,9 @@
 
 Retention is 30 days for the database dumps and Grocy backups.
 
-The PostgreSQL backup PVC is a node-pinned hostPath volume (currently on `pi-lab`). The backup Job intentionally has no `nodeSelector`; the PV node affinity places it on the correct node. Do not pin it to `ubuntu-desktop` or the Job will stay Pending.
+The PostgreSQL backup PVC is a node-pinned hostPath volume (currently on `pi-lab`). The backup Job intentionally has no `nodeSelector`; the PV node affinity places it on the correct node. It also tolerates the `dedicated=pi-lab:NoSchedule` taint. Do not pin it to `ubuntu-desktop` or the Job will stay Pending.
 
-After the fix is applied, delete any old Pending backup Job so the CronJob can schedule a new one:
+Delete any old Pending backup Job so the CronJob can schedule a new one:
 
 ```bash
 kubectl get jobs -n data-storage
