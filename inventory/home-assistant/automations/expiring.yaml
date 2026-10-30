@@ -1,0 +1,21 @@
+alias: Inventory - expiring products
+description: Notify when Grocy reports expiring or expired products.
+mode: single
+trigger:
+  - platform: state
+    entity_id: binary_sensor.grocy_expiring_products
+    to: "on"
+    for:
+      minutes: 5
+  - platform: state
+    entity_id: binary_sensor.grocy_expired_products
+    to: "on"
+    for:
+      minutes: 5
+action:
+  - service: persistent_notification.create
+    data:
+      title: Pantry expiry check
+      message: >-
+        Grocy reports expiring or expired products. Review them at
+        https://grocy.gcelik.dev.

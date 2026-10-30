@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homebox-data
+  namespace: inventory
+  labels:
+    app: homebox
+    app.kubernetes.io/name: homebox
+    app.kubernetes.io/part-of: inventory
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 20Gi

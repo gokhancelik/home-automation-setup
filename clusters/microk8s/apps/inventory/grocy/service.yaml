@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grocy
+  namespace: inventory
+  labels:
+    app: grocy
+    app.kubernetes.io/name: grocy
+    app.kubernetes.io/part-of: inventory
+spec:
+  type: ClusterIP
+  selector:
+    app: grocy
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

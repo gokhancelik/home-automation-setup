@@ -26,10 +26,11 @@ spec:
             - /bin/bash
             - -c
             - |
-              set -e
+              set -e -o pipefail
               BACKUP_DATE=$(date +%Y%m%d-%H%M%S)
               BACKUP_DIR="/backups/postgresql"
               BACKUP_FILE="${BACKUP_DIR}/homeassistant-${BACKUP_DATE}.sql.gz"
+              HOMEBOX_BACKUP_FILE="${BACKUP_DIR}/homebox-${BACKUP_DATE}.sql.gz"
               RETENTION_DAYS=30
               
               echo "=== PostgreSQL Backup Started at $(date) ==="
@@ -54,10 +55,37 @@ spec:
               
               BACKUP_SIZE=$(du -h "${BACKUP_FILE}" | cut -f1)
               echo "Backup completed: ${BACKUP_FILE} (${BACKUP_SIZE})"
-              
+
+              # Dump HomeBox only after its database has been created
+              HOMEBOX_DB_EXISTS=$(PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" psql \
+                -h postgresql.data-storage.svc.cluster.local \
+                -U postgres \
+                -d postgres \
+                -tAc "SELECT 1 FROM pg_database WHERE datname='homebox'")
+              if [ "${HOMEBOX_DB_EXISTS}" = "1" ]; then
+                echo "Dumping database: homebox"
+                PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" pg_dump \
+                  -h postgresql.data-storage.svc.cluster.local \
+                  -U postgres \
+                  -d homebox \
+                  --verbose \
+                  | gzip > "${HOMEBOX_BACKUP_FILE}"
+
+                if [ ! -s "${HOMEBOX_BACKUP_FILE}" ]; then
+                  echo "ERROR: HomeBox backup file is empty"
+                  exit 1
+                fi
+
+                HOMEBOX_BACKUP_SIZE=$(du -h "${HOMEBOX_BACKUP_FILE}" | cut -f1)
+                echo "HomeBox backup completed: ${HOMEBOX_BACKUP_FILE} (${HOMEBOX_BACKUP_SIZE})"
+              else
+                echo "homebox database not found; skipping HomeBox backup"
+              fi
+
               # Delete backups older than retention period
               echo "Cleaning up backups older than ${RETENTION_DAYS} days"
               find "${BACKUP_DIR}" -name "homeassistant-*.sql.gz" -type f -mtime +${RETENTION_DAYS} -delete
+              find "${BACKUP_DIR}" -name "homebox-*.sql.gz" -type f -mtime +${RETENTION_DAYS} -delete
               
               # List remaining backups
               echo "Current backups:"
@@ -70,6 +98,11 @@ spec:
                 secretKeyRef:
                   name: postgresql-credentials
                   key: password
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials
+                  key: postgres-password
             volumeMounts:
             - name: backup-storage
               mountPath: /backups
@@ -84,5 +117,3 @@ spec:
           - name: backup-storage
             persistentVolumeClaim:
               claimName: postgresql-backup-pvc
-          nodeSelector:
-            kubernetes.io/hostname: ubuntu-desktop

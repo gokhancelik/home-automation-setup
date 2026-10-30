@@ -1,0 +1,44 @@
+title: Inventory
+path: inventory
+icon: mdi:package-variant-closed
+cards:
+  - type: markdown
+    title: Inventory
+    content: >-
+      [HomeBox](https://homebox.gcelik.dev) · [Grocy](https://grocy.gcelik.dev)
+  - type: entities
+    title: HomeBox
+    entities:
+      - entity: sensor.homebox_total_items
+        name: Items
+      - entity: sensor.homebox_total_locations
+        name: Locations
+      - entity: sensor.homebox_total_value
+        name: Total value
+      - entity: sensor.homebox_maintenance_due_today
+        name: Maintenance due today
+  - type: entities
+    title: Grocy
+    entities:
+      - entity: sensor.grocy_stock
+        name: Stock
+      - entity: binary_sensor.grocy_missing_products
+        name: Missing products
+      - entity: binary_sensor.grocy_expiring_products
+        name: Expiring products
+      - entity: binary_sensor.grocy_expired_products
+        name: Expired products
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Open HomeBox
+        icon: mdi:package-variant-closed
+        tap_action:
+          action: url
+          url_path: https://homebox.gcelik.dev
+      - type: button
+        name: Open Grocy
+        icon: mdi:cart
+        tap_action:
+          action: url
+          url_path: https://grocy.gcelik.dev

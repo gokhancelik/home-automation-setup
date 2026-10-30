@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: homebox-db-credentials
+  namespace: data-storage
+spec:
+  encryptedData:
+    password: AgBFV4gFeDNiZe7WYQC5j0x1QQ0QUjhkPx8zsePUVZt6K/4abdeEspKoNZtJr2XQ/uVz+70eHyQo2o2UrK5DnFv8Mx2bHqZ/IYi4ctOrb0Hqltx3EQxMP23kT5uuzQF0atjLiKyOXpWjdFw0oqmR1E8vOCIon4rnqjcteOgATY08w48QcLbWXRjy+7C/lDF6eseiWtcnNK4j5K5K8P9wwQvZOatixQ+vgnamKvUZVDjONFEfjFEJDM20mqvVrjWGgFDHDJ7Cn+Hendu1JFNcjfgpuLrxWr1iTBh3gSMQhMQ2gFdq/9sCdB/kWjFH+VmkhaGf0KH8V34xu2ksts7XGodjrDurSoDor0ns3mYFs7cWfgAE4w7c72a3/ZbX4tV87ym+tJXai6oPZT0I+s8iKLNBw8R30HMEYNbgFN9uxVeqldWCeOeSlll2BproYiWg6/KJWw32uLKPXjcWtaos7Xf9xkPn0w0WH2EL0shtzaTcNwfiiJjAgUoNOp1CtlEgLHytqEpAJBaEnPdGARL1X2MhdhoSFU8UNVpENfHjglQHGJkraXHgPTxEETI0MI+76rNrKuE4WkrRYWsOT+jpLyqtLbEqit8DZLqBO0awOt8ssaczicdAODL9ZmxQNoaSXI93iLC4I1m8QhYiygZg3G02Ioi2whuRepXxJ5LxztxxBBjX/oLnwq2+AlZ9dsG/kLAWrMoeCWP2E8jd1srwRXP5OSuaOaW+qrBKTJNxQ1sEMT9VhNSwGlnSLizkdgPL2CzlpTeiHpIs9NHSsvAJ8UGn
+  template:
+    metadata:
+      creationTimestamp: null
+      name: homebox-db-credentials
+      namespace: data-storage

@@ -5,3 +5,5 @@ postgres-ha-user.yaml
 *secret-temp.yaml
 IOT_PLATFORM_CREDENTIALS.md
 CREDENTIALS.md
+inventory/data/*.csv
+!inventory/data/master-inventory.example.csv

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grocy
+  namespace: inventory
+  labels:
+    app: grocy
+    app.kubernetes.io/name: grocy
+    app.kubernetes.io/part-of: inventory
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: grocy
+  template:
+    metadata:
+      labels:
+        app: grocy
+        app.kubernetes.io/name: grocy
+        app.kubernetes.io/part-of: inventory
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-desktop
+      containers:
+        - name: grocy
+          image: lscr.io/linuxserver/grocy:v4.7.1-ls347
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: Europe/Amsterdam
+            - name: GROCY_MODE
+              value: production
+            - name: GROCY_BASE_URL
+              value: https://grocy.gcelik.dev/
+            - name: GROCY_CURRENCY
+              value: EUR
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: grocy-config

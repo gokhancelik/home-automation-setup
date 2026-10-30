@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homebox
+  namespace: inventory
+  labels:
+    app: homebox
+    app.kubernetes.io/name: homebox
+    app.kubernetes.io/part-of: inventory
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: homebox
+  template:
+    metadata:
+      labels:
+        app: homebox
+        app.kubernetes.io/name: homebox
+        app.kubernetes.io/part-of: inventory
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-desktop
+      containers:
+        - name: homebox
+          image: ghcr.io/sysadminsmedia/homebox:0.27.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 7745
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Europe/Amsterdam
+            - name: HBOX_MODE
+              value: production
+            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
+              value: "false"
+            - name: HBOX_OPTIONS_ALLOW_REGISTRATION
+              value: "true"
+            - name: HBOX_OPTIONS_TRUST_PROXY
+              value: "true"
+            - name: HBOX_OPTIONS_HOSTNAME
+              value: https://homebox.gcelik.dev
+            - name: HBOX_WEB_MAX_UPLOAD_SIZE
+              value: "25"
+            - name: HBOX_DATABASE_DRIVER
+              value: postgres
+            - name: HBOX_DATABASE_HOST
+              value: postgresql.data-storage.svc.cluster.local
+            - name: HBOX_DATABASE_PORT
+              value: "5432"
+            - name: HBOX_DATABASE_DATABASE
+              value: homebox
+            - name: HBOX_DATABASE_USERNAME
+              value: homebox
+            - name: HBOX_DATABASE_SSL_MODE
+              value: disable
+            - name: HBOX_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homebox-credentials
+                  key: db-password
+            - name: HBOX_AUTH_API_KEY_PEPPER
+              valueFrom:
+                secretKeyRef:
+                  name: homebox-credentials
+                  key: auth-api-key-pepper
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: homebox-data

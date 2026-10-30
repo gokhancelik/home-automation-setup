@@ -1,0 +1,16 @@
+alias: Inventory - maintenance due
+description: Notify when HomeBox reports maintenance due today.
+mode: single
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.homebox_maintenance_due_today
+    above: 0
+    for:
+      minutes: 5
+action:
+  - service: persistent_notification.create
+    data:
+      title: Home maintenance due
+      message: >-
+        HomeBox reports maintenance due today. Review it at
+        https://homebox.gcelik.dev.

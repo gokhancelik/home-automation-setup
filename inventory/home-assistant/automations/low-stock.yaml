@@ -1,0 +1,16 @@
+alias: Inventory - low stock
+description: Notify when Grocy reports missing products.
+mode: single
+trigger:
+  - platform: state
+    entity_id: binary_sensor.grocy_missing_products
+    to: "on"
+    for:
+      minutes: 5
+action:
+  - service: persistent_notification.create
+    data:
+      title: Pantry stock is low
+      message: >-
+        Grocy reports missing products. Review the shopping list at
+        https://grocy.gcelik.dev.

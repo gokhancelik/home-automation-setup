@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grocy-backup
+  namespace: inventory
+  labels:
+    app: grocy-backup
+    app.kubernetes.io/name: grocy
+    app.kubernetes.io/part-of: inventory
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: grocy-backup
+            app.kubernetes.io/name: grocy
+            app.kubernetes.io/part-of: inventory
+        spec:
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: ubuntu-desktop
+          containers:
+            - name: backup
+              image: lscr.io/linuxserver/grocy:v4.7.1-ls347
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+                  BACKUP_DATE=$(date +%Y%m%d-%H%M%S)
+                  BACKUP_DIR=/backups
+                  DB=/config/data/grocy.db
+                  RETENTION_DAYS=30
+
+                  mkdir -p "${BACKUP_DIR}"
+
+                  if [ -f "${DB}" ]; then
+                    echo "Backing up Grocy database"
+                    SRC="${DB}" DST="${BACKUP_DIR}/grocy-${BACKUP_DATE}.db" php -r '
+                      $pdo = new PDO("sqlite:" . getenv("SRC"));
+                      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                      $pdo->exec("VACUUM INTO " . $pdo->quote(getenv("DST")));
+                    '
+                    gzip -f "${BACKUP_DIR}/grocy-${BACKUP_DATE}.db"
+                  else
+                    echo "WARNING: ${DB} not found; skipping database backup"
+                  fi
+
+                  echo "Archiving Grocy config and uploads"
+                  tar -czf "${BACKUP_DIR}/grocy-config-${BACKUP_DATE}.tar.gz" \
+                    -C /config \
+                    --exclude='data/grocy.db*' \
+                    .
+
+                  find "${BACKUP_DIR}" -type f -name 'grocy-*.gz' -mtime +${RETENTION_DAYS} -delete
+
+                  echo "Current backups:"
+                  ls -lh "${BACKUP_DIR}"
+              env:
+                - name: TZ
+                  value: Europe/Amsterdam
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                - name: backups
+                  mountPath: /backups
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          volumes:
+            - name: config
+              persistentVolumeClaim:
+                claimName: grocy-config
+            - name: backups
+              persistentVolumeClaim:
+                claimName: grocy-backup

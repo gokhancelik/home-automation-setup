@@ -365,3 +365,12 @@ For detailed information about the Matter setup, see: [`MATTER_SETUP.md`](MATTER
 4. Go to Settings → Devices & Services → Integrations
 5. Add Matter integration with URL: `ws://192.168.2.109:5580/ws`
 5. Commission your Matter devices through the integration
+
+## Inventory (HomeBox + Grocy)
+
+NFC-first inventory for storage bins, durable items, and pantry stock.
+
+- HomeBox: <https://homebox.gcelik.dev>
+- Grocy: <https://grocy.gcelik.dev>
+
+Manifests live in `clusters/microk8s/apps/inventory/`. Documentation, runbooks, and Home Assistant examples are in [`inventory/`](inventory/README.md).

@@ -1,0 +1,4 @@
+type,name,system,id,url,tag_uid,location,notes
+bin,Garage shelf A bin 01,homebox,<location-uuid>,https://homebox.gcelik.dev/location/<location-uuid>,,GARAGE-SHELF-A-BIN-01,Example only
+item,Cordless drill,homebox,<item-uuid>,https://homebox.gcelik.dev/item/<item-uuid>,,GARAGE-SHELF-A-BIN-01,High-value item
+product,Milk,grocy,1,https://grocy.gcelik.dev/product/1,,PANTRY-BIN-02,Example only

@@ -32,7 +32,8 @@ Secrets must be encrypted using Sealed Secrets.
 - `charts/`: Local Helm charts (e.g., `home-assistant`).
 - `infrastructure/`: Core services (cert-manager, ingress, observability).
 - `databases/`: Stateful services (PostgreSQL, InfluxDB).
-- `apps/`: Application workloads (Home Assistant, Frigate).
+- `apps/`: Application workloads (Home Assistant, Frigate, inventory).
+- `inventory/`: Inventory documentation, runbooks, and HA integration examples.
 
 ### Infrastructure
 - **Nodes**:
@@ -41,6 +42,7 @@ Secrets must be encrypted using Sealed Secrets.
 - **Storage**:
   - `nfs-storage`: NAS-backed PVCs (Default for stateful apps).
   - `ssd-storage`: Local SSD (Avoid for persistent data).
+  - `local-retain`: Local SSD with `Retain` (Grocy SQLite only).
 
 ## Key Conventions
 
@@ -49,6 +51,8 @@ Secrets must be encrypted using Sealed Secrets.
 - **No HA Supervisor**: This is a "Core" installation. Do not suggest Add-ons or Supervisor features.
 - **Database**:
   - **PostgreSQL**: MANDATORY for Home Assistant recorder. No SQLite.
+  - **PostgreSQL**: Used by HomeBox (`homebox` database).
+  - **SQLite**: Documented exception for Grocy, which does not support PostgreSQL. Grocy lives on `local-retain` SSD storage with daily backups to NFS.
   - **InfluxDB**: Used for long-term metrics.
 - **Hardware Isolation**:
   - Zigbee/Matter radios are physically attached to the Pi (`pi-lab`).
@@ -64,3 +68,4 @@ Secrets must be encrypted using Sealed Secrets.
   - `observability`: Loki, Grafana, Promtail
   - `zigbee`: Zigbee2MQTT, Mosquitto
   - `frigate`: Frigate NVR
+  - `inventory`: HomeBox + Grocy (`homebox.gcelik.dev`, `grocy.gcelik.dev`)

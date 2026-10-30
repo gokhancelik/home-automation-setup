@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grocy-backup
+  namespace: inventory
+  labels:
+    app: grocy
+    app.kubernetes.io/name: grocy
+    app.kubernetes.io/part-of: inventory
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 5Gi

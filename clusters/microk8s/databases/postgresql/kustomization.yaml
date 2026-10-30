@@ -6,3 +6,5 @@ resources:
   - sealed-secrets.yaml
   - backup-pvc.yaml
   - backup-cronjob.yaml
+  - homebox-db-sealed.yaml
+  - homebox-db-init-job.yaml
