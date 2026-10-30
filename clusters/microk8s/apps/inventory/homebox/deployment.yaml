@@ -39,7 +39,7 @@ spec:
             - name: HBOX_OPTIONS_ALLOW_ANALYTICS
               value: "false"
             - name: HBOX_OPTIONS_ALLOW_REGISTRATION
-              value: "true"
+              value: "false"
             - name: HBOX_OPTIONS_TRUST_PROXY
               value: "true"
             - name: HBOX_OPTIONS_HOSTNAME
