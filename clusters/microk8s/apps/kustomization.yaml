@@ -2,13 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  # - home-assistant/   # migrated to Docker on pi-lab
-  # - matter-server/    # migrated to Docker on pi-lab
-  - home-assistant-ingress/   # ha.gcelik.dev -> Docker HA on pi-lab (192.168.2.59:8123)
+  # - home-assistant/   # migrated to HAOS (192.168.1.203)
+  # - matter-server/    # migrated to HAOS (192.168.1.203)
+  - home-assistant-ingress/   # ha.gcelik.dev -> HAOS (192.168.1.203:8123)
   - zigbee/
   - frigate/
   - test-web/
   - factory-lens/
   - portainer/
-  - paperclip-ingress/   # paperclip.gcelik.dev -> Paperclip on aibox (192.168.2.43:3100), LAN only
+  - paperclip-ingress/   # paperclip.gcelik.dev -> Paperclip on ubuntu-desktop (192.168.1.153:3100), LAN only
   - inventory/           # homebox.gcelik.dev + grocy.gcelik.dev

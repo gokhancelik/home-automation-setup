@@ -30,7 +30,7 @@ spec:
               name: tailscale-auth
               key: TS_AUTHKEY
         - name: TS_ROUTES
-          value: "192.168.2.0/24"
+          value: "192.168.1.0/24"
         - name: TS_STATE_DIR
           value: /var/lib/tailscale
         - name: TS_USERSPACE

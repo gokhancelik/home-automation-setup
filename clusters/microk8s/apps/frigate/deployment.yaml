@@ -53,8 +53,14 @@ spec:
 
               fi
 
-              # Download newer go2rtc to fix dual-H264-track bug in v1.9.10
-              wget -q "https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_linux_amd64" -O /go2rtc-bin/go2rtc && chmod +x /go2rtc-bin/go2rtc || echo "go2rtc download failed, using embedded version"
+              # Prefer the locally built patched go2rtc (Nest receiver + session fixes).
+              # Fall back to stock v1.9.15 only if the hostPath artifact is missing.
+              if [ -x /go2rtc-patched/go2rtc ]; then
+                cp /go2rtc-patched/go2rtc /go2rtc-bin/go2rtc
+              else
+                wget -q "https://github.com/AlexxIT/go2rtc/releases/download/v1.9.15/go2rtc_linux_amd64" -O /go2rtc-bin/go2rtc
+              fi
+              chmod +x /go2rtc-bin/go2rtc || echo "go2rtc setup failed, using embedded version"
           env:
             - name: MQTT_USER
               valueFrom:
@@ -123,6 +129,9 @@ spec:
               mountPath: /config-template
             - name: go2rtc-bin
               mountPath: /go2rtc-bin
+            - name: go2rtc-patched
+              mountPath: /go2rtc-patched
+              readOnly: true
       containers:
         - name: frigate
           image: ghcr.io/blakeblackshear/frigate:0.17.1
@@ -187,8 +196,9 @@ spec:
             failureThreshold: 2
       volumes:
         - name: config
-          persistentVolumeClaim:
-            claimName: frigate-config
+          hostPath:
+            path: /home/gokhan/frigate-config
+            type: Directory
         - name: config-template
           configMap:
             name: frigate-config
@@ -205,6 +215,11 @@ spec:
             type: Directory
         - name: go2rtc-bin
           emptyDir: {}
+        # Built by the procedure in NEST_CAMERA_FIX.md; see that file before changing.
+        - name: go2rtc-patched
+          hostPath:
+            path: /opt/frigate-go2rtc
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

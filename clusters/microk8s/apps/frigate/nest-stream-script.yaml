@@ -27,7 +27,7 @@ data:
 
     ha_token = os.environ['HA_TOKEN']
     entity_id = sys.argv[1]
-    url = f"http://192.168.2.59:8123/api/camera_proxy_stream/{entity_id}"
+    url = f"http://192.168.1.203:8123/api/camera_proxy_stream/{entity_id}"
 
     sys.stderr.write(f"nest_stream: connecting to {entity_id}\n")
     sys.stderr.flush()

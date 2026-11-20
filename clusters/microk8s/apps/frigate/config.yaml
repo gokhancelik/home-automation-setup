@@ -9,7 +9,7 @@ data:
     # https://docs.frigate.video/configuration/
 
     mqtt:
-      host: 192.168.2.59
+      host: 192.168.1.203
       port: 1883
       user: "{FRIGATE_MQTT_USER}"
       password: "{FRIGATE_MQTT_PASSWORD}"
@@ -91,10 +91,10 @@ data:
         enabled: true
         ffmpeg:
           inputs:
-            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch3
+            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.1.180:8554/ch3
               roles:
                 - detect
-            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.2.12:8554/ch3  # Use lower quality for recording too
+            - path: rtsp://{DOORBELL_USER}:{DOORBELL_PASSWORD}@192.168.1.180:8554/ch3  # Use lower quality for recording too
               roles:
                 - record
         detect:
@@ -135,10 +135,10 @@ data:
         enabled: true  # Re-enabled - camera is active
         ffmpeg:
           inputs:
-            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch4
+            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.1.207:8554/ch4
               roles:
                 - detect
-            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.2.48:8554/ch3  # Lower quality stream for recording
+            - path: rtsp://{BACKYARD_USER}:{BACKYARD_PASSWORD}@192.168.1.207:8554/ch3  # Lower quality stream for recording
               roles:
                 - record
         detect:
@@ -165,18 +165,21 @@ data:
               - dog
               - cat
 
+      # See NEST_CAMERA_FIX.md for the Nest OAuth + patched-go2rtc runbook.
       nest_camera:
         enabled: true
         ffmpeg:
+          hwaccel_args: []
           inputs:
-            # First consumer gets the empty H264 track (sacrificial)
+            # Separate consumers for recording and detection.
+            # Requires the patched go2rtc; stock v1.9.14/1.9.15 can bind the
+            # first cold consumer to an empty H264 receiver on Nest dial.
             - path: rtsp://127.0.0.1:8554/nest_back_garden
               input_args:
                 - -rtsp_transport
                 - tcp
               roles:
                 - record
-            # Second consumer gets the working H264 track
             - path: rtsp://127.0.0.1:8554/nest_back_garden
               input_args:
                 - -rtsp_transport

@@ -38,10 +38,10 @@ flux reconcile kustomization flux-system --with-source
 
 ### 6. Approve Subnet Router in Tailscale Admin
 - Find device "home-k8s-gateway"
-- Edit route settings → Approve 192.168.2.0/24
+- Edit route settings → Approve 192.168.1.0/24
 
 ## Access Your Home Network
-- Home Assistant: http://192.168.2.59:8123
-- Grafana: http://192.168.2.43:3000
-- NAS: \\192.168.2.24
-- SSH: ssh gokhan@192.168.2.43
+- Home Assistant: http://192.168.1.203:8123
+- Grafana: http://192.168.1.153:3000
+- NAS: \\192.168.1.211
+- SSH: ssh gokhan@192.168.1.153

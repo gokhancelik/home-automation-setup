@@ -15,7 +15,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs-media
   nfs:
-    server: 192.168.2.24  # Update with your NAS IP
+    server: 192.168.1.211  # Update with your NAS IP
     path: /volume1/media   # Update with your NFS export path
   mountOptions:
     - nfsvers=3
@@ -61,7 +61,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs-media
   nfs:
-    server: 192.168.2.24
+    server: 192.168.1.211
     path: /volume1/media  # Base NFS export - use subPath in deployment
   mountOptions:
     - nfsvers=3
@@ -107,7 +107,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs-media
   nfs:
-    server: 192.168.2.24
+    server: 192.168.1.211
     path: /volume1/media  # Base NFS export - use subPath in deployment
   mountOptions:
     - nfsvers=3

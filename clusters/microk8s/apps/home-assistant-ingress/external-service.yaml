@@ -1,5 +1,5 @@
 # Routes ha.gcelik.dev (terminated by nginx-ingress + cert-manager) to the
-# Home Assistant container running under Docker on pi-lab (192.168.2.59:8123).
+# Home Assistant running on HAOS (192.168.1.203:8123).
 # Headless Service with no selector, bound to a manually-managed EndpointSlice.
 apiVersion: v1
 kind: Service
@@ -31,7 +31,7 @@ ports:
   protocol: TCP
 endpoints:
 - addresses:
-  - "192.168.2.59"
+  - "192.168.1.203"
   conditions:
     ready: true
     serving: true

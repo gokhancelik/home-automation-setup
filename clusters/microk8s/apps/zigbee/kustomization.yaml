@@ -7,7 +7,7 @@ resources:
   # Frigate, factory-lens, and the Docker Zigbee2MQTT all use it).
   - mosquitto-config.yaml
   - mosquitto-deployment.yaml
-  # Zigbee2MQTT migrated to Docker on pi-lab (192.168.2.59). The K8s
+  # Zigbee2MQTT migrated to the HAOS add-on (192.168.1.203). The K8s
   # Deployment was removed because its privileged pod kept grabbing
   # /dev/ttyUSB0 from the Docker container, causing sensor dropouts.
   # - zigbee2mqtt-config.yaml
