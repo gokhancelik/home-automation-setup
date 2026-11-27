@@ -1,0 +1,85 @@
+# Copy of homebox-db-init-job.yaml for the trading database. The role gets no extra privileges and only its own database.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trading-db-init
+  namespace: data-storage
+  labels:
+    app: trading-db-init
+    app.kubernetes.io/name: trading
+    app.kubernetes.io/part-of: tradingengine
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: trading-db-init
+        app.kubernetes.io/name: trading
+        app.kubernetes.io/part-of: tradingengine
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001 # the bitnami postgresql user
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-desktop
+      containers:
+        - name: db-init
+          image: docker.io/bitnami/postgresql@sha256:2faab3906ce920e5237c38b3a85db4c8dbfb3571f42eb4f935737872d803c5d0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail
+
+              export PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}"
+              HOST="postgresql.data-storage.svc.cluster.local"
+              ROLE="trading"
+              DB="trading"
+              ROLE_PASSWORD="${TRADING_DB_PASSWORD}"
+
+              echo "Ensuring role ${ROLE} exists"
+              # The password goes in as a psql variable (:'pw'), never spliced into the SQL text, and is not echoed.
+              ROLE_EXISTS=$(psql -h "${HOST}" -U postgres -d postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='${ROLE}'")
+              if [ "${ROLE_EXISTS}" = "1" ]; then VERB="ALTER"; else VERB="CREATE"; fi
+              echo "${VERB} ROLE ${ROLE} WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD :'pw'" \
+                | psql -h "${HOST}" -U postgres -d postgres -v ON_ERROR_STOP=1 -v pw="${ROLE_PASSWORD}"
+
+              echo "Ensuring database ${DB} exists"
+              DB_EXISTS=$(psql -h "${HOST}" -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${DB}'")
+              if [ "${DB_EXISTS}" = "1" ]; then
+                echo "Database ${DB} already exists"
+              else
+                psql -h "${HOST}" -U postgres -d postgres -v ON_ERROR_STOP=1 \
+                  -c "CREATE DATABASE ${DB} OWNER ${ROLE}"
+              fi
+
+              psql -h "${HOST}" -U postgres -d postgres -v ON_ERROR_STOP=1 \
+                -c "ALTER DATABASE ${DB} OWNER TO ${ROLE}" \
+                -c "REVOKE ALL ON DATABASE ${DB} FROM PUBLIC"
+              psql -h "${HOST}" -U postgres -d "${DB}" -v ON_ERROR_STOP=1 \
+                -c "GRANT ALL ON SCHEMA public TO ${ROLE}"
+
+              echo "Trading database initialization complete"
+          env:
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-credentials
+                  key: postgres-password
+            - name: TRADING_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trading-db-credentials # sealed by the owner, key "password"
+                  key: password
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 250m, memory: 256Mi }

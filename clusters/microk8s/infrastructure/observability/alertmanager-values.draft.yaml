@@ -1,0 +1,40 @@
+# NOT APPLIED: this file is not listed in kustomization.yaml. Merge these values into prometheus-helmrelease.yaml
+# (replacing `alertmanager.enabled: false`) only after sealing alertmanager-secrets into alertmanager-sealed-secret.yaml
+# and listing that file in kustomization.yaml. A missing secret leaves the Alertmanager pod stuck, which fails the Helm
+# upgrade of the whole Prometheus release. kube-state-metrics is already enabled there.
+# Secret: keys telegram-bot-token and deadmans-switch-url, namespace observability. Set chat_id to your Telegram chat id.
+# Check key names against `helm show values prometheus-community/prometheus --version <pinned>` first.
+alertmanager:
+  enabled: true
+  # The bot token and the check-in URL are secrets: mount them from a sealed Secret as files, never inline here.
+  extraSecretMounts:
+    - name: alertmanager-secrets
+      mountPath: /etc/alertmanager/secrets
+      secretName: alertmanager-secrets # keys: telegram-bot-token, deadmans-switch-url
+      readOnly: true
+  config:
+    route:
+      receiver: owner-warn
+      group_by: [alertname]
+      routes:
+        - matchers: [severity="page"]
+          receiver: owner-page
+          repeat_interval: 1h
+        - matchers: [severity="watchdog"]
+          receiver: deadmans-switch
+          repeat_interval: 5m # ping the check-in service every 5 minutes; it pages when the pings stop
+    receivers:
+      - name: owner-page
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-bot-token
+            chat_id: 0 # the owner's chat id (a number, not secret)
+            send_resolved: true
+      - name: owner-warn
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-bot-token
+            chat_id: 0
+            send_resolved: false
+      - name: deadmans-switch
+        webhook_configs:
+          - url_file: /etc/alertmanager/secrets/deadmans-switch-url
+            send_resolved: false

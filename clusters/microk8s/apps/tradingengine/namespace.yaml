@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trading
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled # never delete the namespace (and its volume) by pruning
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted

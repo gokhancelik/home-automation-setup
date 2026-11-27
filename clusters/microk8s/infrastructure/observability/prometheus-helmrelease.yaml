@@ -59,11 +59,117 @@ spec:
             - target_label: __address__
               replacement: snmp-exporter.observability.svc.cluster.local:9116
 
+    # TradingEngine alert rules (paper trading). Every rule has a runbook in the TradingEngine repo,
+    # docs/runbooks/operations.md. Until Alertmanager is enabled (see alertmanager-values.draft.yaml) they are only
+    # visible on Prometheus' Alerts page and reach nobody. TradingApiDown fires until the trading app is deployed.
+    serverFiles:
+      alerting_rules.yml:
+        groups:
+          - name: trading
+            rules:
+              - alert: TradingWorkerHeartbeatStale
+                expr: te_worker_heartbeat_age_seconds > 900
+                for: 5m
+                labels: { severity: page }
+                annotations:
+                  summary: The trading worker has not reported for 15 minutes (or has never reported).
+                  runbook: docs/runbooks/operations.md#worker-not-reporting
+              - alert: TradingWorkerError
+                expr: te_worker_state{state="Error"} == 1
+                for: 1m
+                labels: { severity: page }
+                annotations:
+                  summary: The worker is in the Error state (for example the paper-only guard blocked trading).
+                  runbook: docs/runbooks/operations.md#worker-error
+              - alert: TradingHaltedByLossLimit
+                expr: te_trading_halted_by_loss_limit == 1 # the API matches the reason prefix HaltReasons.DailyLossLimit (Core), shared with the Phase 9 worker
+                for: 0m
+                labels: { severity: page }
+                annotations:
+                  summary: Trading was halted by the daily loss limit. A person must resume.
+                  runbook: docs/runbooks/operations.md#halted-by-the-loss-limit
+              - alert: TradingApiDown
+                # up == 0 only fires while the target exists; absent() and the deployment check cover a pod that is gone.
+                # The label is `namespace` or `kubernetes_namespace` depending on the scrape config: check which one your series carry.
+                expr: |
+                  up{job=~".*",namespace="trading"} == 0
+                    or absent(up{namespace="trading"})
+                    or kube_deployment_status_replicas_available{namespace="trading",deployment="trading-api"} < 1
+                for: 5m
+                labels: { severity: page }
+                annotations:
+                  summary: The trading API target is down.
+                  runbook: docs/runbooks/operations.md#api-down
+              - alert: TradingStatusPollFailing
+                expr: increase(te_engine_status_poll_failures_total[10m]) > 0
+                for: 10m
+                labels: { severity: warn }
+                annotations:
+                  summary: The API cannot read the engine status from the database; the dashboard shows halted.
+                  runbook: docs/runbooks/operations.md#api-down
+              - alert: TradingPodRestarting
+                expr: increase(kube_pod_container_status_restarts_total{namespace="trading"}[15m]) > 0
+                for: 15m
+                labels: { severity: warn }
+                annotations:
+                  summary: A trading pod keeps restarting.
+                  runbook: docs/runbooks/operations.md#api-down
+              - alert: PostgresBackupMissing
+                # A backup that never ran (CronJob suspended, image pull failing, node down at 02:00) leaves no failed Job to see.
+                expr: time() - kube_cronjob_status_last_successful_time{cronjob="postgresql-backup"} > 26 * 3600
+                for: 0m
+                labels: { severity: page }
+                annotations:
+                  summary: No successful PostgreSQL backup in the last 26 hours.
+                  runbook: docs/runbooks/operations.md#restore-drill
+              - alert: Watchdog
+                # Always firing. Alertmanager sends it to an external check-in service (the dead man's switch), which pages
+                # when the pings STOP: a dead node, Prometheus or Alertmanager is otherwise silent because everything runs on one box.
+                expr: vector(1)
+                labels: { severity: watchdog }
+                annotations:
+                  summary: Alerting pipeline heartbeat (should always be firing).
+                  runbook: docs/runbooks/operations.md#api-down
+              - alert: PostgresBackupFailed
+                expr: kube_job_status_failed{job_name=~"postgresql-backup.*"} > 0
+                for: 0m
+                labels: { severity: page }
+                annotations:
+                  summary: The nightly PostgreSQL backup job failed.
+                  runbook: docs/runbooks/operations.md#restore-drill
+              - alert: NodeDiskFilling
+                expr: |
+                  node_filesystem_avail_bytes{mountpoint=~"/|/mnt/ssd-data",fstype!~"tmpfs|overlay"}
+                    / node_filesystem_size_bytes{mountpoint=~"/|/mnt/ssd-data",fstype!~"tmpfs|overlay"} < 0.15
+                for: 15m
+                labels: { severity: warn }
+                annotations:
+                  summary: A node filesystem has less than 15% free.
+                  runbook: docs/runbooks/operations.md#api-down
+              - alert: CertificateExpiringSoon
+                expr: (certmanager_certificate_expiration_timestamp_seconds{namespace="trading"} - time()) < 14 * 24 * 3600
+                for: 1h
+                labels: { severity: warn }
+                annotations:
+                  summary: The trading TLS certificate expires in under 14 days.
+                  runbook: docs/runbooks/operations.md#api-down
+
+    # Staged: enabling Alertmanager needs the sealed alertmanager-secrets first, see alertmanager-values.draft.yaml.
     alertmanager:
       enabled: false
     
+    # Needed for the pod restart, deployment and backup CronJob/Job alerts above.
     kube-state-metrics:
-      enabled: false
+      enabled: true
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-desktop
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
     
     prometheus-node-exporter:
       enabled: true

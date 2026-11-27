@@ -8,3 +8,6 @@ resources:
   - backup-cronjob.yaml
   - homebox-db-sealed.yaml
   - homebox-db-init-job.yaml
+  # TradingEngine: uncomment both after sealing trading-db-credentials (see apps/tradingengine/README.md, step 3).
+  # - trading-db-sealed.yaml
+  # - trading-db-init-job.yaml

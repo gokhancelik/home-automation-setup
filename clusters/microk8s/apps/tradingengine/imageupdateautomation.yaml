@@ -1,0 +1,30 @@
+# API and frontend only. The worker image is bumped by hand in a PR, so a new trading binary never goes live on its own.
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: tradingengine
+  namespace: flux-system
+spec:
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: tradingengine-rw
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: |
+        chore(flux): update tradingengine image tags
+
+        {{range .Updated.Images -}}
+        - {{.}}
+        {{end -}}
+    push:
+      branch: main
+  update:
+    path: ./k8s
+    strategy: Setters

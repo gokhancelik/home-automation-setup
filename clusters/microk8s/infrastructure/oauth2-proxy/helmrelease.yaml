@@ -1,0 +1,46 @@
+# Verify the values against `helm show values oauth2-proxy/oauth2-proxy --version <pinned>` before applying:
+# key names changed between chart majors. The version is pinned on purpose; Dependabot does not see Flux HelmReleases, so bump it by hand.
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: oauth2-proxy
+      version: 10.7.0
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy
+        namespace: flux-system
+      interval: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    config:
+      existingSecret: oauth2-proxy-secrets # sealed: client-id, client-secret, cookie-secret
+    extraArgs:
+      provider: github
+      github-user: gokhancelik          # the ONLY restriction: never add github-org or github-team, which would widen access
+      email-domain: "*"                 # access is limited by the user name above
+      cookie-secure: "true"
+      cookie-samesite: lax              # strict breaks the OAuth callback (the CSRF cookie is not sent on the redirect back from github.com); the API's own CSRF header check covers state-changing calls
+      cookie-expire: 12h
+      set-xauthrequest: "true"
+      reverse-proxy: "true"
+      redirect-url: https://trading.gcelik.dev/oauth2/callback
+      upstream: static://202            # auth only: ingress-nginx calls /oauth2/auth, the UI is not proxied through here
+    # The namespace enforces Pod Security `restricted`. Run `helm template` on the pinned chart version and check that the pod
+    # sets runAsNonRoot, drops ALL capabilities, disallows privilege escalation and uses seccompProfile RuntimeDefault.
+    # If it does not by default, add the chart's security context values here (key names differ by chart version).
+    nodeSelector:
+      kubernetes.io/hostname: ubuntu-desktop
+    resources:
+      requests: { cpu: 25m, memory: 32Mi }
+      limits: { cpu: 200m, memory: 128Mi }

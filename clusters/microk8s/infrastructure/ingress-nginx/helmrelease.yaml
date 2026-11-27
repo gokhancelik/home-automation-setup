@@ -33,8 +33,15 @@ spec:
         enable-ssl-chain-completion: "true"
       allowSnippetAnnotations: true
       config:
+        # The public hostnames are proxied by Cloudflare, so the client address arrives in X-Forwarded-For.
+        # Trust that header ONLY when the TCP peer is Cloudflare (or the LAN / pod network, e.g. a cloudflared connector).
+        # Without proxy-real-ip-cidr ingress-nginx trusts it from 0.0.0.0/0, and any client reaching the WAN address
+        # directly could send "X-Forwarded-For: 192.168.1.10" and pass every whitelist-source-range (paperclip, trading).
+        # real_ip_recursive takes the right-most untrusted address, i.e. the one Cloudflare appended, so a forged
+        # left-hand entry is ignored. Cloudflare ranges from https://www.cloudflare.com/ips/ (re-check yearly).
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
+        proxy-real-ip-cidr: "173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
         use-proxy-protocol: "false"
         ssl-protocols: "TLSv1.2 TLSv1.3"
       metrics:
