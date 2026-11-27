@@ -1,0 +1,15 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImagePolicy
+metadata:
+  name: trading-frontend
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: trading-frontend
+  # Only vX.Y.Z tags; the extra sha-<short> tags never match.
+  filterTags:
+    pattern: '^v\d+\.\d+\.\d+$'
+    extract: '$0'
+  policy:
+    semver:
+      range: '>=0.0.0'

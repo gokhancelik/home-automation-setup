@@ -6,6 +6,7 @@
 | --- | --- | --- | --- |
 | HomeBox database | `pg_dump` of `homebox` | `postgresql-backup-pvc` | Daily 02:00 |
 | Home Assistant database | `pg_dump` of `homeassistant` | `postgresql-backup-pvc` | Daily 02:00 |
+| TradingEngine database | `pg_dump` of `trading` (skipped until the database exists) | `postgresql-backup-pvc` | Daily 02:00 |
 | HomeBox attachments | NAS snapshot / PVC copy | `homebox-data` on NFS | NAS policy |
 | Grocy SQLite database | `VACUUM INTO` + gzip | `grocy-backup` on NFS | Daily 02:30 |
 | Grocy config/uploads | `tar.gz` of `/config` without live DB | `grocy-backup` on NFS | Daily 02:30 |
@@ -128,6 +129,17 @@ Restore from the NAS snapshot or copy the directory back to the same NFS path. S
    ```
 
 7. Verify login, products, and stock.
+
+## Restore TradingEngine database
+
+1. **Stop Flux from undoing the restore:** `flux suspend kustomization tradingengine`.
+2. Scale both to zero: `kubectl -n trading scale deploy/trading-api deploy/trading-worker --replicas=0`.
+3. Restore: `gunzip -c trading-<date>.sql.gz | psql -h postgresql.data-storage.svc.cluster.local -U postgres -d trading`. If the database must be dropped first, recreate it **`OWNER trading`** (or re-run the `trading-db-init` job), otherwise the grants are lost.
+4. Start the **API only**: `kubectl -n trading scale deploy/trading-api --replicas=1`. Check `/api/engine/status`. It must show **halted**. If it does not (the dump was taken while the engine was running), halt it from the UI or API before anything else.
+5. Only then start the worker: `kubectl -n trading scale deploy/trading-worker --replicas=1`. It must stay halted until a person resumes.
+6. `flux resume kustomization tradingengine`.
+
+Done when the next 02:00 run produces a non-empty `trading-*.sql.gz`.
 
 ## Restore test cadence
 

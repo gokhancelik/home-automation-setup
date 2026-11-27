@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageRepository
+metadata:
+  name: trading-frontend
+  namespace: flux-system
+spec:
+  image: ghcr.io/gokhancelik/tradingengine-frontend
+  interval: 1m
+  secretRef:
+    name: ghcr-flux-pull

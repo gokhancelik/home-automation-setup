@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# TradingEngine (paper trading only) on ubuntu-desktop. App manifests live in the private repo gokhancelik/TradingEngine (./k8s).
+# Staged on purpose: only the namespace and the namespace-scoped Flux identity are live. The rest needs a sealed
+# secret first, and a missing file here would break the whole flux-system sync, so uncomment in order (see README.md).
+resources:
+  - namespace.yaml
+  - rbac.yaml
+  # Step 2, after sealing tradingengine-github-token into github-token-sealed.yaml:
+  # - github-token-sealed.yaml
+  # - gitrepository.yaml
+  # - imagerepository-api.yaml
+  # - imagerepository-frontend.yaml
+  # - imagepolicy-api.yaml
+  # - imagepolicy-frontend.yaml
+  # - imageupdateautomation.yaml
+  # Step 3, after the trading-db init job has run and the app repo's sealed secrets are committed:
+  # - flux-kustomization.yaml

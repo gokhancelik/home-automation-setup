@@ -1,0 +1,45 @@
+# Namespace-scoped identity for the Flux Kustomization, so a bad merge in the app repo cannot create
+# cluster-wide objects. The Namespace itself (namespace.yaml, with the restricted pod-security labels)
+# is applied from the infra repo, not from the app repo.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tradingengine-reconciler
+  namespace: flux-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tradingengine-reconciler
+  namespace: trading
+rules:
+  - apiGroups: [""]
+    resources: [services, configmaps, persistentvolumeclaims]
+    verbs: [get, list, watch, create, update, patch, delete]
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [get, list, watch, create, update, patch, delete]
+  - apiGroups: [networking.k8s.io]
+    resources: [networkpolicies, ingresses]
+    verbs: [get, list, watch, create, update, patch, delete]
+  - apiGroups: [bitnami.com]
+    resources: [sealedsecrets]
+    verbs: [get, list, watch, create, update, patch, delete]
+  # Read-only on Secrets (to check that the sealed ones decrypted); no creating or editing plain Secrets here.
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tradingengine-reconciler
+  namespace: trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tradingengine-reconciler
+subjects:
+  - kind: ServiceAccount
+    name: tradingengine-reconciler
+    namespace: flux-system

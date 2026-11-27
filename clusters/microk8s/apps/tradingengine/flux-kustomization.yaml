@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tradingengine
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./k8s
+  prune: true
+  # Not cluster-admin: apply as a service account that can only touch the trading namespace (see rbac.yaml).
+  serviceAccountName: tradingengine-reconciler
+  targetNamespace: trading
+  sourceRef:
+    kind: GitRepository
+    name: tradingengine-rw
+  healthChecks:
+    - { apiVersion: apps/v1, kind: Deployment, name: trading-api, namespace: trading }
+    - { apiVersion: apps/v1, kind: Deployment, name: trading-frontend, namespace: trading }
+    - { apiVersion: apps/v1, kind: Deployment, name: trading-worker, namespace: trading }
