@@ -69,3 +69,5 @@ Secrets must be encrypted using Sealed Secrets.
   - `zigbee`: Zigbee2MQTT, Mosquitto
   - `frigate`: Frigate NVR
   - `inventory`: HomeBox + Grocy (`homebox.gcelik.dev`, `grocy.gcelik.dev`)
+  - `trading`: TradingEngine (paper trading only; Pod Security `restricted`; app manifests in the private repo `gokhancelik/TradingEngine`, applied by a namespace-scoped Flux service account). See `clusters/microk8s/apps/tradingengine/README.md`.
+  - `oauth2-proxy`: GitHub login in front of `trading.gcelik.dev` (staged, not wired yet)
