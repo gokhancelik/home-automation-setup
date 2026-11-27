@@ -6,15 +6,20 @@ Not wired yet: the line in `clusters/microk8s/infrastructure/kustomization.yaml`
 Only the GitHub user `gokhancelik` may log in (`github-user`). Never add `github-org` or `github-team`; that widens access.
 
 ## Before enabling
-1. **Gate: the IP allow-list must not be spoofable.** After the ingress-nginx change in this repo (`use-forwarded-headers: "false"`)
-   has synced, check `kubectl -n ingress-nginx get cm ingress-nginx-controller -o yaml` and
+1. **Gate: the IP allow-list must not be spoofable.** The sites are proxied by Cloudflare, so ingress-nginx trusts
+   `X-Forwarded-For` only from Cloudflare's ranges and private networks (`proxy-real-ip-cidr` in
+   `infrastructure/ingress-nginx/helmrelease.yaml`). After that has synced, check
+   `kubectl -n ingress-nginx get cm ingress-nginx-controller -o yaml` (shows `proxy-real-ip-cidr`) and
    `kubectl -n ingress-nginx get svc -o yaml | grep externalTrafficPolicy` (must be `Local`). Then, from a phone on mobile
    data with no VPN:
    ```
    curl -sk -o /dev/null -w "%{http_code}\n" https://paperclip.gcelik.dev/
    curl -sk -o /dev/null -w "%{http_code}\n" -H "X-Forwarded-For: 192.168.1.10" https://paperclip.gcelik.dev/
+   # straight to the home IP, past Cloudflare (only if the router forwards 443 to the internet):
+   curl -sk -o /dev/null -w "%{http_code}\n" --resolve paperclip.gcelik.dev:443:88.159.77.246 -H "X-Forwarded-For: 192.168.1.10" https://paperclip.gcelik.dev/
    ```
-   Both must return 403. Repeat for `trading.gcelik.dev` once its ingress exists.
+   All must return 403 (the last one may also time out). From the LAN, the first one must return 200.
+   Repeat for `trading.gcelik.dev` once its ingress exists.
 2. Create a GitHub OAuth app with callback `https://trading.gcelik.dev/oauth2/callback`.
 3. Seal `oauth2-proxy-secrets` (namespace `oauth2-proxy`) into `sealed-secret.yaml` in this folder:
    ```bash
