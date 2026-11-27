@@ -8,3 +8,4 @@ resources:
   - observability/
   - storage/
   - tailscale/
+  # - oauth2-proxy/   # GitHub login for trading.gcelik.dev; enable after sealing oauth2-proxy-secrets (see oauth2-proxy/README.md)
